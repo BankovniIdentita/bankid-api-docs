@@ -1,0 +1,633 @@
+openapi: 3.0.0
+info:
+  title: APIs exposed by Bank iD for Identity Providers
+  version: 1.2.3
+  description: >
+    Describes APIs exposed by Bank iD for Identity Providers
+
+paths:
+  /back-channel/logout:
+    description: >-
+      Logout endpoint specified in [OpenID.BackChannelLogout](https://openid.net/specs/openid-connect-backchannel-1_0.html).
+
+
+      This specific pathname is RECOMMENDED, exact pathname has to be set in `backchannel_logout_uri` property during dynamic client registration.
+
+
+      Implementors note: it is possible to register this EP with a query parameter containing `state` or similar, which could allow easier pairing of `client_id`
+    post:
+      tags:
+        - Back-Channel Logout
+      operationId: backChannelLogout
+      security:
+        - {}
+      requestBody:
+        required: true
+        description: JWT containing JSON as payload.
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BackLogoutRequest'
+      responses:
+        '200':
+          description: Logout successful
+          headers:
+            traceId:
+              description: Unique ID for each API call for support purposes.
+              schema:
+                $ref: '#/components/schemas/traceId'
+        '400':
+          description: Logout request was invalid
+          headers:
+            traceId:
+              description: Unique ID for each API call for support purposes.
+              schema:
+                $ref: '#/components/schemas/traceId'
+        '500':
+          description: Logout has failed
+          headers:
+            traceId:
+              description: Unique ID for each API call for support purposes.
+              schema:
+                $ref: '#/components/schemas/traceId'
+        '504':
+          description: Logout succeeded but some downstream logouts have failed
+          headers:
+            traceId:
+              description: Unique ID for each API call for support purposes.
+              schema:
+                $ref: '#/components/schemas/traceId'
+  /notify:
+    description: >-
+      Batch notification endpoint which accepts a list of notification tokens. These are mainly claim update notifications.
+    post:
+      tags:
+        - Notifications
+      operationId: getNotifications
+      security:
+        - {}
+      requestBody:
+        required: true
+        description: x-www-form-encoded format with signle value of JWT as payload.
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NotificationRequest'
+      responses:
+        '200':
+          description: Notification batch accepted successfully
+          headers:
+            traceId:
+              description: Unique ID for each API call for support purposes.
+              schema:
+                $ref: '#/components/schemas/traceId'
+  /.well-known/jwks.json:
+    get:
+      description: >-
+        This endpoint returns JSON Web Keys to be used as public keys for verifying OIDC ID Tokens, responses and encrypting requests.
+      tags:
+        - Discovery
+      summary: JSON Web Keys Discovery
+      operationId: getJWKS
+      security:
+        - {}
+      externalDocs:
+        description: '[RFC7517] JSON Web Key (JWK)'
+        url: https://tools.ietf.org/html/rfc7517
+      responses:
+        '200':
+          description: JWKS
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JWKS'
+          headers:
+            traceId:
+              description: Unique ID for each API call for support purposes.
+              schema:
+                $ref: '#/components/schemas/traceId'
+
+  /user-stat-data:
+    description: >-
+      This endpoint returns statistical data for the purpose of fraud prevetion.
+    post:
+      tags:
+        - User Stat Data
+      operationId: userStatData
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        description: JSON with user identification and period
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserStatDataRequest'
+      responses:
+        '200':
+          description: Data has been provided successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserStatDataResponse'
+          headers:
+            traceId:
+              description: Unique ID for each API call for support purposes.
+              schema:
+                $ref: '#/components/schemas/traceId'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserStatDataErrorResponse'
+          headers:
+            traceId:
+              description: Unique ID for each API call for support purposes.
+              schema:
+                $ref: '#/components/schemas/traceId'
+        '500':
+          description: Request has failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserStatDataErrorResponse'
+          headers:
+            traceId:
+              description: Unique ID for each API call for support purposes.
+              schema:
+                $ref: '#/components/schemas/traceId'
+
+components:
+  securitySchemes:
+    bearerAuth:            
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    traceId:
+      description: Unique ID for each API call for support purposes.
+      type: string
+      pattern: '^[a-zA-Z0-9]{32}$'
+      example: 26f6ea6095205ebc26f6ea6095205ebc
+    BackLogoutRequest:
+      description: >-
+        Signed and encrypted JWT similar to the ID Token containing the following fields:
+      type: object
+      required: 
+        - logout_token
+      properties: 
+        logout_token: 
+          type: string
+          description: >-
+            Signed and encrypted JWT similar to the ID Token containing fields form LogoutToken scheme
+    LogoutToken:
+      required:
+        - iss
+        - sub
+        - aud
+        - iat
+        - jti
+        - events
+      properties:
+        iss:
+          type: string
+          description: >-
+            Issuer Identifier for the Issuer of the response.
+            The iss value is a case sensitive URL using the https scheme that contains scheme, host, and optionally, port number and path components and no query or fragment components.
+          example: https://idp.example.com
+        sub:
+          type: string
+          description: >-
+            Subject Identifier.
+            A locally unique and never reassigned identifier within the Issuer for the End-User, which is intended to be consumed by the Client, e.g., 24400320 or AItOawmwtWwcT0k51BayewNvutrJUqsvl6qs7A4.
+            It MUST NOT exceed 255 ASCII characters in length.
+            The sub value is a case sensitive string.
+          example: 9456B875-62D3-4533-A502-E05D39936F3A
+        aud:
+          type: string
+          description: >-
+            Audience(s) that this ID Token is intended for.
+            It MUST contain the OAuth 2.0 client_id of the Relying Party as an audience value.
+            It MAY also contain identifiers for other audiences.
+            In the general case, the aud value is an array of case sensitive strings.
+            In the common special case when there is one audience, the aud value MAY be a single case sensitive string.
+          example: F932FF05-E04C-4CD1-86E4-CE82F1F51EFB
+        iat:
+          type: number
+          format: int64
+          description: Time at which the JWT was issued. Its value is a JSON number representing the number of seconds from 1970-01-01T0:0:0Z as measured in UTC until the date/time.
+          example: 1582797458
+        jti:
+          type: string
+          description: >-
+            JWT ID. A unique identifier for the token, which can be used to prevent reuse of the token.
+            These tokens MUST only be used once, unless conditions for reuse were negotiated between the parties; any such negotiation is beyond the scope of this specification
+          example: 913CC0F7-27BA-40D9-9F4F-8DF74AC3596B
+        events:
+          type: object
+          description: Claim whose value is a JSON object containing the member name http://schemas.openid.net/event/backchannel-logout. This declares that the JWT is a Logout Token. The corresponding member value MUST be a JSON object and SHOULD be the empty JSON object {}.
+          required:
+            - 'http://schemas.openid.net/event/backchannel-logout'
+          properties:
+            'http://schemas.openid.net/event/backchannel-logout':
+              type: object
+  
+    UserStatDataRequest:
+      description: >-
+        Signed and encrypted JWT.
+      type: object
+      required:
+        - daysBefore
+      properties:
+        daysBefore:
+          type: integer
+          format: int64
+          description: Number of days for history search from actual date. Maximum number of days is 30.
+          example: 25
+        idp:
+          type: boolean
+          description: >-
+            Limit only to IdP records.
+          example: true
+        idpSub:
+          type: string
+          description: >-
+            Subject Identifier in IdP scheme. Either idpSub or sepSub must be provided.
+            A locally unique and never reassigned identifier within the Issuer for the End-User, which is intended to be consumed by the Client, e.g., 24400320 or AItOawmwtWwcT0k51BayewNvutrJUqsvl6qs7A4.
+            It MUST NOT exceed 255 ASCII characters in length.
+            The sub value is a case sensitive string.
+          example: 9456B875-62D3-4533-A502-E05D39936F3A
+        sepSub:
+          type: string
+          description: >-
+            Subject Identifier in Bank iD scheme. Either idpSub or sepSub must be provided.
+            A locally unique and never reassigned identifier within the Issuer for the End-User, which is intended to be consumed by the Client, e.g., 24400320 or AItOawmwtWwcT0k51BayewNvutrJUqsvl6qs7A4.
+            It MUST NOT exceed 255 ASCII characters in length.
+            The sub value is a case sensitive string.
+          example: F932FF05-E04C-4CD1-86E4-CE82F1F51EFB
+    UserStatDataResponse:
+      description: >-
+        Signed and encrypted JWT.
+      type: object
+      required:
+        - firstAuth
+        - lastAuth
+        - numberOfRecords
+        - authHistory
+      properties:
+        firstAuth:
+          type: string
+          format: 'date-time'
+          description: 'Time stamp in ISO 8601:2004 [ISO8601-2004] YYYY-MM-DDThh:mm:ss±hh format **with colon in date offset** (e.g. 2015-04-05T14:31:22+02:00) representing the date and time when user first used their identity'
+          example: "2021-04-05T14:31:22+02:00"
+        lastAuth:
+          type: string
+          format: 'date-time'
+          description: 'Time stamp in ISO 8601:2004 [ISO8601-2004] YYYY-MM-DDThh:mm:ss±hh format **with colon in date offset** (e.g. 2015-04-05T14:31:22+02:00) representing the date and time when user last used their identity'
+          example: "2023-04-05T14:31:22+02:00"
+        numberOfRecords:
+          type: integer
+          format: int64
+          description: Number of records returned.
+          example: 80
+        message:
+          type: string
+        authHistory:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuthHistory'
+          description: >-
+            History values of users' authentications.
+        numberOfIdpRecords:
+          type: integer
+          format: int64
+          description: Number of IdP records returned.
+          example: 8
+    AuthHistory:
+      type: object
+      properties:
+        authDateTime:
+          type: string
+          format: 'date-time'
+          description: 'Time stamp in ISO 8601:2004 [ISO8601-2004] YYYY-MM-DDThh:mm:ss±hh format **with colon in date offset** (e.g. 2015-04-05T14:31:22+02:00) representing the date and time when user used their identity'
+          example: "2023-04-05T14:31:22+02:00"        
+        idp:
+          type: boolean
+          description: True if authentication has been used against an IdP.
+          example: false
+    UserStatDataErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          enum:
+            - invalid_request
+            - internal_server_error
+          description: >-
+            Possible error codes:
+            * invalid_request - The request is missing a required parameter or daysBefore is greater than 30.
+          example: invalid_request
+        error_description:
+          type: string
+          description: Additional text description of the error for debugging.
+          example: daysBefore is greater than 30
+      description: >-
+        * **error** - **REQUIRED**.  A single ASCII [USASCII] error code from the following:
+
+          - **invalid_request** - 
+                The request is missing a required parameter, includes an unsupported parameter value, repeats a parameter or is otherwise malformed daysBefore is greater then 30.
+          - **internal_server_error** - 
+                The request failed on exception on server or in upstream component.
+        
+        * **error_description**
+              OPTIONAL.  Human-readable ASCII [USASCII] text providing additional information, used to assist the client developer in understanding the error that occurred.
+              Values for the "error_description" parameter MUST NOT include characters outside the set %x20-21 / %x23-5B / %x5D-7E.
+    NotificationEvent:
+      description: >-
+        An event describing a change. It is possible to filter the specificity of the event using the `affected_` filters.
+      type: object
+      required:
+        - type
+        - original_event_at
+        - sub
+        - affected_client_ids
+        - affected_claims
+      properties:
+        type:
+          type: string
+          enum:
+            - claims_updated
+          description: >-
+            - claims_updated: A claim has changed. `affected_subs` is mandatory,
+                            `affected_claims` is possible to supply as well, depending on the business case
+          example: claims_updated
+        original_event_at:
+          type: string
+          format: date-time
+          description: >-
+            What is the original time that this event has happened at
+        sub:
+          type: string
+          description: >-
+            Affected sub
+          example: '9456B875-62D3-4533-A502-E05D39936F3A'
+        affected_client_ids:
+          type: array
+          items:
+            type: string
+          description: >-
+            An array of affected client_ids
+          example: ['F932FF05-E04C-4CD1-86E4-CE82F1F51EFB']
+        affected_claims:
+          type: array
+          items:
+            type: string
+          description: >-
+            An array of modified claims. This is relevant for `type` of `claims_updated`
+          example: ['phone_number', 'addresses', 'idcards']
+    
+    NotificationRequest:
+      description:  >-
+        Body for notify endpoint
+      type: object
+      required:
+        - notification_token
+      properties:
+        notification_token:
+          type: string
+          description: Single key containing NotificaitonJWT (see scheme below) as payload for notification endpoint.
+          example: >-
+            eyJraWQiOiJycC1lbmNyeXB0I2I4OTJmNWQzLTdhZGItNGVjOC1hZmE2LWUyODQ3OGVhOTAyZSIsImVuYyI6IkEyNTZHQ00iLCJhbGciOiJSU0EtT0FFUCJ9.LaTBrUbYNZms52z4BpINS-hh-OA-p9cR2ZrqI1n7kJy6UI1MC48wQWAyj5VdPkwXI7M_yqsM8ZKRzVOW-5vINCOm0JOFH4NUfr0CYhMkbcIdWiaP2Y-DPQispkHlDr9UT-iMUkz5Naffj0KYbi0EEuwrZ6ZDd6tHUBRQz9FltL0uHAH-aWL4-5BV1yyGn6thQ9UR25WGItAMRMHQ7K50EKhOgjxlQhzL9mFdlkWCXQED3SxBD-xmcMk-6eGnndmm3B5QQ82tPNoUHBO_E8-moj4sxH6JdFa0z7njfDTFtjT1BKxPEyeo8XOMQlv06QSSXMDcVZ-FFjLNc2u-QT8HKyOSOsRfRA8ppaeQ1L7X3gCiUklqbHXc6ScwTSpn_zymlo7lkjL4rAyYdVhcOyB-X9nILzpbp9wQxbU5-mhMAtPWfUnMSJOIlu8ZitDc070XHQLaGcaGybLz1K-GN_GcenNd_Q5YHXosRAVtwpyOmI38NgRymBra5ow6a9L3xVJGvoGv8RgF45UByeGeXkjHU2278d5f-dSwY3iIVPZrE--CY8FCOPG0-iw0YpBjGjwJnw8JH1-PUnSKwbsJlZz0aQ6bAMxoXLY8_f3IobPuVRjUJIrESz_KuF9QNgNbVxR5HblRpkzX1XDYYdlYDuawSDUbp_l8BZho1TaQshgHTlc.SB9XWaIxWzQjW0n3.IyH6kY7Ezjt4lx8YsGQDQydXhF_XbBYwB6ae5y3uHMrIcAW5q2sa3Ua1ctYBalN_yd-ig2caRNaRO1p6ZXUYaRAhSLfZFiItbU9jexqmgBL2vN9Dug6ZPh_d-3EyGRI8tDLSdRhGWArMS62qUfxFdc_IL9J0lFC8C6q83FZwO7dYidIprHjxe0D2le8FZsFIAmh3W0ADtVP7cShlHlsACnhhhfD9Bo_icEHWJvH9GEWfurRlAmIhQUMsFa53Hc3gQeI6Mb6bYYbZiKA_5WuNDMzKNB9zvkWjvdNfk2iMWtEIgrxO_U4j1eVsBM8OmkPDjkWwrQTS6lLduBdFJzwQn92kqTv36crRmTWxjeQ_eR8k9PRV1HvVIwGIMSuScyva8tBKiTNi1ecbV2GNOuxYQvPKlt3towZe_nf5Cvb257eIjNsiofh2wZdiVuYIxRWUMXrYUlKeC5XgdxserNqFfFL9QMuwExkXzb_1_9pfoCUZ3qVYlAJcMHE3QVk_kdjeRv4Yr4TnAIiFBUpiS1A3IqDRpBHliUsRinUuEMP8szn5MY37tVLKvyMOBic3tlSEc5wNic_TOfEwN7PU7rMqbrcGN68t50RFYCj0CrqwYcK9OTpLPPV1521yIwG8yIFQY10rRCggYKxzMtuovKxUaV7pEY_xXVKB88mr2LNJ4cMMJwMPyXG-pmGzYrErkcQQiQ-FFzIwJI5Yp5tGa1CF6wfNY76KRHtbAf_7wuQVM1EcvYGMU6ICbXq8dKQq_k_dcEI9bcCUTsqCgXpC7bLXyJyUVE8Fss8nl-yOKlgXy9OmnMZP3i3n7kmFJXmldW7RWsCfZ5V_GkjHrkZA9kntk9Mf4LFhaTAc1YMe8SC3onF9OY1lpmKNdF6V0l_6aJ2LyiebRLGEycZKPiNL06p2tJ-Y_l03j6KCvsSVrXHoyiLErCz5gw.QxAtyJOwq6sqBqnrwQrCRg
+    NotificationJWT:
+      description: >-
+        Signed and encrypted JWT which serves as a vessel for notification events:
+      type: object
+      required:
+        - iss
+        - iat
+        - jti
+        - events
+      properties:
+        iss:
+          type: string
+          description: >-
+            Issuer Identifier for the Issuer of the response.
+            The iss value is a case sensitive URL using the https scheme that contains scheme, host, and optionally, port number and path components and no query or fragment components.
+          example: https://idp.example.com
+        iat:
+          type: number
+          format: int64
+          description: Time at which the JWT was issued. Its value is a JSON number representing the number of seconds from 1970-01-01T0:0:0Z as measured in UTC until the date/time.
+          example: 1582797458
+        jti:
+          type: string
+          description: >-
+            JWT ID. A unique identifier for the token, which can be used to prevent reuse of the token.
+            These tokens MUST only be used once, unless conditions for reuse were negotiated between the parties; any such negotiation is beyond the scope of this specification
+          example: 913CC0F7-27BA-40D9-9F4F-8DF74AC3596B
+        events:
+          description: An array of notification events
+          type: array
+          items:
+            $ref: '#/components/schemas/NotificationEvent'
+    JWKS:
+      description: JSONWebKeySet JSON web key set
+      type: object
+      properties:
+        keys:
+          description: >-
+            The value of the "keys" parameter is an array of JWK values.  By
+            default, the order of the JWK values within the array does not imply
+            an order of preference among them, although applications of JWK Sets
+            can choose to assign a meaning to the order for their purposes, if
+            desired.
+          type: array
+          items:
+            $ref: '#/components/schemas/JWK'
+    JWK:
+      description: JSON Web Key [RFC7517](https://tools.ietf.org/html/rfc7517)
+      type: object
+      required:
+        - use
+        - kty
+        - kid
+        - alg
+        - x5c
+      properties:
+        alg:
+          description: >-
+            The "alg" (algorithm) parameter identifies the algorithm intended for
+            use with the key.  The values used should either be registered in the
+            IANA "JSON Web Signature and Encryption Algorithms" registry
+            established by [JWA] or be a value that contains a Collision-
+            Resistant Name. The "alg" value is a case-sensitive ASCII string.
+          type: string
+          example: RS256
+          enum:
+            - RS256
+            - RS384
+            - RS512
+            - ES256
+            - ES384
+            - ES512
+            - RSA1_5
+            - RSA-OAEP
+            - ECDH-ES
+            - A128KW
+            - A256KW
+            - A128GCM
+            - A256GCM
+        kid:
+          description: >-
+            The "kid" (key ID) parameter is used to match a specific key.  This
+            is used, for instance, to choose among a set of keys within a JWK Set
+            during key rollover.  The structure of the "kid" value is
+            unspecified.  When "kid" values are used within a JWK Set, different
+            keys within the JWK Set SHOULD use distinct "kid" values.  (One
+            example in which different keys might use the same "kid" value is if
+            they have different "kty" (key type) values but are considered to be
+            equivalent alternatives by the application using them.)  The "kid"
+            value is a case-sensitive string.  Use of this member is OPTIONAL.
+            When used with JWS or JWE, the "kid" value is used to match a JWS or
+            JWE "kid" Header Parameter value.
+          type: string
+          example: 1603dfe0af8f4596
+        key_ops:
+          description: >-
+            The "key_ops" (key operations) parameter identifies the operation(s)
+            for which the key is intended to be used.  The "key_ops" parameter is
+            intended for use cases in which public, private, or symmetric keys
+            may be present.
+
+
+            Its value is an array of key operation values.  Values defined by
+            this specification are:
+
+            * "sign" (compute digital signature or MAC)
+
+            * "verify" (verify digital signature or MAC)
+
+            * "encrypt" (encrypt content)
+
+            * "decrypt" (decrypt content and validate decryption, if applicable)
+
+            * "wrapKey" (encrypt key)
+
+            * "unwrapKey" (decrypt key and validate decryption, if applicable)
+
+            * "deriveKey" (derive key)
+
+            * "deriveBits" (derive bits not to be used as a key)
+
+            (Note that the "key_ops" values intentionally match the "KeyUsage"
+            values defined in the Web Cryptography API
+            [W3C.CR-WebCryptoAPI-20141211] specification.)
+
+
+            Other values MAY be used.  The key operation values are case-
+            sensitive strings.  Duplicate key operation values MUST NOT be
+            present in the array.  Use of the "key_ops" member is OPTIONAL,
+            unless the application requires its presence.
+
+
+            Multiple unrelated key operations SHOULD NOT be specified for a key
+            because of the potential vulnerabilities associated with using the
+            same key with multiple algorithms.  Thus, the combinations "sign"
+            with "verify", "encrypt" with "decrypt", and "wrapKey" with
+            "unwrapKey" are permitted, but other combinations SHOULD NOT be used.
+
+
+            Additional "key_ops" (key operations) values can be registered in the
+            IANA "JSON Web Key Operations" registry established by Section 8.3.
+            The same considerations about registering extension values apply to
+            the "key_ops" member as do for the "use" member.
+
+
+            The "use" and "key_ops" JWK members SHOULD NOT be used together;
+            however, if both are used, the information they convey MUST be
+            consistent.  Applications should specify which of these members they
+            use, if either is to be used by the application.
+          type: array
+          items:
+            type: string
+            enum:
+              - sign
+              - verify
+              - encrypt
+              - decrypt
+              - wrapKey
+              - unwrapKey
+              - deriveKey
+              - deriveBits
+          example: [sign, verify]
+        use:
+          description: >-
+            The "use" (public key use) parameter identifies the intended use of
+            the public key.  The "use" parameter is employed to indicate whether
+            a public key is used for encrypting data or verifying the signature
+            on data.
+
+
+            Values defined by this specification are:
+
+            *  "sig" (signature)
+
+            *  "enc" (encryption)
+
+            Other values MAY be used.  The "use" value is a case-sensitive
+            string.  Use of the "use" member is OPTIONAL, unless the application
+            requires its presence.
+
+
+            When a key is used to wrap another key and a public key use
+            designation for the first key is desired, the "enc" (encryption) key
+            use value is used, since key wrapping is a kind of encryption.  The
+            "enc" value is also to be used for public keys used for key agreement
+            operations.
+          type: string
+          enum:
+            - sig
+            - enc
+          example: sig
+        kty:
+          description: >-
+            The "kty" (key type) parameter identifies the cryptographic algorithm
+            family used with the key, such as "RSA" or "EC".  "kty" values should
+            either be registered in the IANA "JSON Web Key Types" registry
+            established by [JWA] or be a value that contains a Collision-
+            Resistant Name.  The "kty" value is a case-sensitive string.  This
+            member MUST be present in a JWK.
+
+
+            A list of defined "kty" values can be found in the IANA "JSON Web Key
+            Types" registry established by [JWA]; the initial contents of this
+            registry are the values defined in Section 6.1 of [JWA].
+
+
+            The key type definitions include specification of the members to be
+            used for those key types.  Members used with specific "kty" values
+            can be found in the IANA "JSON Web Key Parameters" registry
+            established by Section 8.1.
+          type: string
+          example: RSA
+          enum:
+            - RSA
+            - EC
+        x5c:
+          description: >-
+            The "x5c" (X.509 certificate chain) parameter contains a chain of one
+            or more PKIX certificates [RFC5280].  The certificate chain is
+            represented as a JSON array of certificate value strings.  Each
+            string in the array is a base64-encoded (Section 4 of [RFC4648] --
+            not base64url-encoded) DER [ITU.X690.1994] PKIX certificate value.
+            The PKIX certificate containing the key value MUST be the first
+            certificate.  This MAY be followed by additional certificates, with
+            each subsequent certificate being the one used to certify the
+            previous one.  The key in the first certificate MUST match the public
+            key represented by other members of the JWK.
+          type: string
+          format: uri
+          example: MIICUDCCAbmgAwIBAgIBADANBgkqhkiG9w0BAQsFADBFMQswCQYDVQQGEwJjejEOMAwGA1UECAwFUHJhaGExEDAOBgNVBAoMB0V4YW1wbGUxFDASBgNVBAMMC2V4YW1wbGUuY29tMB4XDTIwMDExNjE2NDExOFoXDTIxMDExNTE2NDExOFowRTELMAkGA1UEBhMCY3oxDjAMBgNVBAgMBVByYWhhMRAwDgYDVQQKDAdFeGFtcGxlMRQwEgYDVQQDDAtleGFtcGxlLmNvbTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEArOEYBRyBhcd6u3phrbU2xvTaBoy6W14CpqqfsBrfsUsuSB+JELBCj3a+zRIvy4EY9cnQbF7cPNxbXdCbGEokAUjIIuVBk/I6XhKRe01vlax82o+eFfIhUfl7Xb2Bx9U3m98Qbt3WNrv+VYJjjFP8HWSsWCHKCazj+yvozjuFXUsCAwEAAaNQME4wHQYDVR0OBBYEFN5SUrsStd4aLhBs+MWGRDxLeUP4MB8GA1UdIwQYMBaAFN5SUrsStd4aLhBs+MWGRDxLeUP4MAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQELBQADgYEAL59fE6itiRrck6Z7RCjwnOnebQJxpoB/L7TUC/aUIXss40mCviBVKD+Hl4+3sGyp4J2LlzzqhFcPgR9NyxQt0bkahJGH0UXvZETJe719UA0kGFrPMdt6ujwB6/rafT6TinzXN0lEEGikersTrh3BR9Hjw+v7nCQ0D5RfuDn6s5s=
