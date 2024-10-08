@@ -1,0 +1,285 @@
+openapi: 3.0.0
+info:
+  title: Service Providers for Bank iD front/back-channel APIs
+  version: 1.2.0
+
+paths:
+  /back-channel/logout:
+    post:
+      description: >-
+        Logout endpoint specified in [OpenID.BackChannelLogout](https://openid.net/specs/openid-connect-backchannel-1_0.html).
+      tags:
+        - Back-Channel Logout
+      operationId: backChannelLogout
+      parameters:
+        - in: header
+          name: traceId
+          schema:
+            $ref: '#/components/schemas/traceId'
+      requestBody:
+        required: true
+        description: JWT contating JSON as payload.
+        content:
+          application/jwe:
+            schema:
+              $ref: '#/components/schemas/BackLogoutRequest'
+      responses:
+        '200':
+          description: Logout successful
+          headers:
+            traceId:
+              description: Unique ID for each API call for support purposes.
+              schema:
+                $ref: '#/components/schemas/traceId'
+        '400':
+          description: Logout request was invalid
+          headers:
+            traceId:
+              description: Unique ID for each API call for support purposes.
+              schema:
+                $ref: '#/components/schemas/traceId'
+        '500':
+          description: Logout has failed
+          headers:
+            traceId:
+              description: Unique ID for each API call for support purposes.
+              schema:
+                $ref: '#/components/schemas/traceId'
+        '504':
+          description: Logout succeeded but some downstream logouts have failed
+          headers:
+            traceId:
+              description: Unique ID for each API call for support purposes.
+              schema:
+                $ref: '#/components/schemas/traceId'
+
+  /front-channel/logout:
+    get:
+      description: >-
+        Logout endpoint specified in [OpenID.FrontChannelLogout](https://openid.net/specs/openid-connect-frontchannel-1_0.html). Rendered in an IFrame
+      tags:
+        - Front-Channel Logout
+      operationId: frontChannelLogout
+      parameters:
+        - in: header
+          name: traceId
+          schema:
+            $ref: '#/components/schemas/traceId'
+        - name: iss
+          in: query
+          schema:
+            type: string
+          description: Issuer Identifier, as specified in Section 2 of [OpenID.Core].
+          example: https://idp.example.com
+        - name: sid
+          in: query
+          schema:
+            type: string
+          description: >-
+            Session ID - String identifier for a Session. This represents a Session of a User Agent
+            or device for a logged-in End-User at an RP. Different sid values are used to identify
+            distinct sessions at an OP. The sid value need only be unique in the context of a particular issuer. 
+            Its contents are opaque to the RP. Its syntax is the same as an OAuth 2.0 Client Identifier.
+      responses:
+        '200':
+          description: Logout successful
+          headers:
+            traceId:
+              description: Unique ID for each API call for support purposes.
+              schema:
+                $ref: '#/components/schemas/traceId'
+        '400':
+          description: Logout request was invalid
+          headers:
+            traceId:
+              description: Unique ID for each API call for support purposes.
+              schema:
+                $ref: '#/components/schemas/traceId'
+        '500':
+          description: Logout has failed
+          headers:
+            traceId:
+              description: Unique ID for each API call for support purposes.
+              schema:
+                $ref: '#/components/schemas/traceId'
+        '504':
+          description: Logout succeeded but some downstream logouts have failed
+          headers:
+            traceId:
+              description: Unique ID for each API call for support purposes.
+              schema:
+                $ref: '#/components/schemas/traceId'
+  /notify:
+    post:
+      description: >-
+        Batch notification endpoint which accepts a list of notification tokens. These are mainly claim update notifications.
+      tags:
+        - Notifications
+      operationId: getNotifications
+      parameters:
+        - in: header
+          name: traceId
+          schema:
+            $ref: '#/components/schemas/traceId'
+      requestBody:
+        required: true
+        description: JWT contating JSON as payload.
+        content:
+          application/jwe:
+            schema:
+              $ref: '#/components/schemas/NotificationRequest'
+      responses:
+        '200':
+          description: Notification batch accepted successfully
+          headers:
+            traceId:
+              description: Unique ID for each API call for support purposes.
+              schema:
+                $ref: '#/components/schemas/traceId'
+
+components:
+  schemas:
+    traceId:
+      description: Unique ID for each API call for support purposes.
+      type: string
+      pattern: '^[a-zA-Z0-9]{16}$'
+      example: 26f6ea6095205ebc
+    NotificationRequest:
+      externalDocs:
+        description: '[OpenID.BackChannelLogout] 2.4. Logout Token'
+        url: 'https://openid.net/specs/openid-connect-backchannel-1_0.html#LogoutToken'
+      description: >-
+        Signed and encrypted JWT which serves as a vessel for notification events.
+        (Encryption is only applied if SeP has encryption set for the application and has configured a JWKS endpoint in the developer portal)
+      type: object
+      required:
+        - iss
+        - iat
+        - jti
+        - events
+      properties:
+        iss:
+          type: string
+          description: >-
+            Issuer Identifier for the Issuer of the response.
+            The iss value is a case sensitive URL using the https scheme that contains scheme, host, and optionally, port number and path components and no query or fragment components.
+          example: https://idp.example.com
+        iat:
+          type: number
+          format: int64
+          description: Time at which the JWT was issued. Its value is a JSON number representing the number of seconds from 1970-01-01T0:0:0Z as measured in UTC until the date/time.
+          example: 1582797458
+        jti:
+          type: string
+          description: >-
+            JWT ID. A unique identifier for the token, which can be used to prevent reuse of the token.
+            These tokens MUST only be used once, unless conditions for reuse were negotiated between the parties; any such negotiation is beyond the scope of this specification
+          example: 913CC0F7-27BA-40D9-9F4F-8DF74AC3596B
+        events:
+          description: An array of notification events
+          type: array
+          items:
+            $ref: '#/components/schemas/NotificationEvent'
+
+    BackLogoutRequest:
+      externalDocs:
+        description: '[OpenID.BackChannelLogout] 2.4. Logout Token'
+        url: 'https://openid.net/specs/openid-connect-backchannel-1_0.html#LogoutToken'
+      description: >-
+        Signed and encrypted JWT similar to the ID Token containing the following fields:
+      type: object
+      required:
+        - iss
+        - sub
+        - aud
+        - iat
+        - jti
+        - events
+      properties:
+        iss:
+          type: string
+          description: >-
+            Issuer Identifier for the Issuer of the response.
+            The iss value is a case sensitive URL using the https scheme that contains scheme, host, and optionally, port number and path components and no query or fragment components.
+          example: https://idp.example.com
+        sub:
+          type: string
+          description: >-
+            Subject Identifier.
+            A locally unique and never reassigned identifier within the Issuer for the End-User, which is intended to be consumed by the Client, e.g., 24400320 or AItOawmwtWwcT0k51BayewNvutrJUqsvl6qs7A4.
+            It MUST NOT exceed 255 ASCII characters in length.
+            The sub value is a case sensitive string.
+          example: 9456B875-62D3-4533-A502-E05D39936F3A
+        aud:
+          type: string
+          description: >-
+            Audience(s) that this ID Token is intended for.
+            It MUST contain the OAuth 2.0 client_id of the Relying Party as an audience value.
+            It MAY also contain identifiers for other audiences.
+            In the general case, the aud value is an array of case sensitive strings.
+            In the common special case when there is one audience, the aud value MAY be a single case sensitive string.
+          example: F932FF05-E04C-4CD1-86E4-CE82F1F51EFB
+        iat:
+          type: number
+          format: int64
+          description: Time at which the JWT was issued.
+          example: 3600
+        jti:
+          type: string
+          description: >-
+            JWT ID. A unique identifier for the token, which can be used to prevent reuse of the token.
+            These tokens MUST only be used once, unless conditions for reuse were negotiated between the parties; any such negotiation is beyond the scope of this specification
+          example: 913CC0F7-27BA-40D9-9F4F-8DF74AC3596B
+        sid:
+          type: string
+          description: >-
+            Session ID - String identifier for a Session. This represents a Session of a User Agent or device for a logged-in End-User at an RP. Different sid values are used to identify distinct sessions at an OP. The sid value need only be unique in the context of a particular issuer. Its contents are opaque to the RP. Its syntax is the same as an OAuth 2.0 Client Identifier.
+          example: A13CC0F7-27BA-40D9-9F4F-8DF74AC7596B
+        events:
+          type: object
+          description: Claim whose value is a JSON object containing the member name http://schemas.openid.net/event/backchannel-logout. This declares that the JWT is a Logout Token. The corresponding member value MUST be a JSON object and SHOULD be the empty JSON object {}.
+          required:
+            - 'http://schemas.openid.net/event/backchannel-logout'
+          properties:
+            'http://schemas.openid.net/event/backchannel-logout':
+              type: object
+
+    NotificationEvent:
+      description: >-
+        An event describing a change. It is possible to filter the specificity of the event using the `affected_` filters.
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          enum:
+            - claims_updated
+          description: >-
+            - claims_updated: A claim has changed. `affected_subs` is mandatory,
+                            `affected_claims` is possible to supply as well, depending on the business case
+          example: claim_updated
+        original_event_at:
+          type: string
+          format: date-time
+          description: >-
+            What is the original time that this event has happened at
+        sub:
+          type: string
+          description: >-
+            Affected sub
+          example: '9456B875-62D3-4533-A502-E05D39936F3A'
+        affected_client_ids:
+          type: array
+          items:
+            type: string
+          description: >-
+            An optional array of affected client_ids
+          example: ['F932FF05-E04C-4CD1-86E4-CE82F1F51EFB']
+        affected_claims:
+          type: array
+          items:
+            type: string
+          description: >-
+            An optional array of modified claims. This is relevant for `type` of `claims_updated`
+          example: ['phone_number', 'addresses', 'idcards']
