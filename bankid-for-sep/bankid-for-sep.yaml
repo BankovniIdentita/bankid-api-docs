@@ -3,7 +3,7 @@ info:
   title: Bank iD APIs for Service Providers
   version: 1.3.3
   description: |
-    Describes APIs exposed by Bank iD for Service Providers
+    Describes APIs exposed by Bank iD for Service Providers. Changelog available at [GitHub](https://github.com/BankovniIdentita/bankid-api-docs/tree/main/bankid-for-sep).
 
 security:
   - userInfo:
