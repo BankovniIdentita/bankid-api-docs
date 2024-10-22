@@ -3,9 +3,7 @@ info:
   title: APIs exposed by Bank iD for Identity Providers
   version: 1.2.3
   description: >
-    Describes APIs exposed by Bank iD for Identity Providers
-
-    Changelog available at [GitHub](https://github.com/BankovniIdentita/bankid-api-docs/tree/main/bankid-for-idp)
+    Describes APIs exposed by Bank iD for Identity Providers. Changelog available at [GitHub](https://github.com/BankovniIdentita/bankid-api-docs/tree/main/bankid-for-idp)
 
 paths:
   /back-channel/logout:
