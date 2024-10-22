@@ -1,17 +1,8 @@
 # Bank iD
 
-Here is a bird's-eye overview of the Bank iD system, its technical goals, decisions and related motivations. This document SHOULD also provide a starting point for implementors wishing to achieve compliance with the Bank iD technical specification.
+Bank iD technical specification.
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC2119](https://www.ietf.org/rfc/rfc2119).
-
-## Glossary
-
-**SeP** - Service Provider - A third party which is registered in the Bank iD system and intends to consume Bank APIs.<br>
-**PII** - Personally Identifiable Information - End-User information like name, email address or state-issued IDs.<br>
-**AML** - Anti-Money Laundering - A set of laws and regulations intended to prevent money laundering.<br>
-**KYC** - Know Your Customer - A Bank API which allows SePs to gather information about End-Users.<br>
-**IdP** - Identity Provider - A component on the side of the Bank which handles authorization and consent and issues tokens.<br>
-**RP** - Relying Party - RP is a party using the provider's identity services. From the bank's point of view, the Relying Party is Bank iD, and for Bank iD, it is the Service Provider.<br>
 
 ## What is Bank iD?
 
