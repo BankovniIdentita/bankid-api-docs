@@ -3,7 +3,7 @@ info:
   title: APIs exposed for Bank iD by Identity Providers
   version: 1.2.8
   description: |
-    Describes APIs exposed by Identity Providers for Bank iD
+    Describes APIs exposed by Identity Providers for Bank iD. Changelog available at [GitHub](https://github.com/BankovniIdentita/bankid-api-docs/tree/main/idp-for-bankid).
 
 security:
   - userInfo:
