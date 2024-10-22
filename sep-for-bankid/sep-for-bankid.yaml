@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  title: Service Providers for Bank iD front/back-channel APIs
+  title: APIs exposed by Service Providers for Bank iD
   version: 1.2.0
   description: |
     Describes APIs exposed by Service Providers for Bank iD. Changelog available at [GitHub](https://github.com/BankovniIdentita/bankid-api-docs/tree/main/sep-for-bankid).
