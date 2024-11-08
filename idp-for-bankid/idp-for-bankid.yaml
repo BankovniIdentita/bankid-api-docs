@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: APIs exposed for Bank iD by Identity Providers
-  version: 1.2.8
+  version: 2.0.0
   description: |
     Describes APIs exposed by Identity Providers for Bank iD. Changelog available at [GitHub](https://github.com/BankovniIdentita/bankid-api-docs/tree/main/idp-for-bankid).
 
@@ -963,6 +963,7 @@ components:
       description: OAuth 2.0 Client Identifier valid at the Authorization Server.
       schema:
         type: string
+        format: uuid
       example: D40D25DB-C330-4331-A191-0A4F6CCD17D8
 
     redirect_uri:
@@ -1165,12 +1166,11 @@ components:
       description: >-
         The parameter represents the required authentication level. The application should only request values configured in the developer portal (Enable 2FA by default switch in configuration).
         The values determine the level of authentication as well as the possible use of authentication factors.
-        The value of ```loa2``` corresponds to one-factor authentication. The value of ```loa3``` corresponds to authentication using two independent verification factors (2FA or also SCA).
+        The value of ```loa3``` corresponds to authentication using two independent verification factors (2FA or also SCA).
       schema:
         type: string
         enum:
           - loa3
-          - loa2
         example: 'loa3'
 
     auth_claims_json:
@@ -1876,12 +1876,11 @@ components:
             
             
             The values determine the level of authentication as well as the possible use of authentication factors.
-            The value of ```loa2``` corresponds to one-factor authentication. The value of ```loa3``` corresponds to authentication
+            The value of ```loa3``` corresponds to authentication
             using two independent verification factors (2FA or also SCA).
           type: string
           default: loa3
           enum:
-            - loa2
             - loa3
           example: 'loa3'
         response_type:
@@ -1976,10 +1975,12 @@ components:
             properties:
               key:
                 type: string
+                maxLength: 255
                 description: Key for value, can be displayed to end-user as label.
                 example: 'Consent'
               value:
                 type: string
+                maxLength: 1024
                 description: Value for user authorization, must be displayed to end-user
                 example: 'I consent with sending marketing messages to my email and telephone'
               priority:
@@ -2011,17 +2012,22 @@ components:
           description: >-
             Id of document included in custom PDF metadata. This attribute must be included in PDF metadata under document-id key.
           type: string
+          maxLength: 255
           example: '7159534b-3b88-4f29-866b-9e83489d3053'
         document_hash:
           type: string
+          minLength: 512
+          maxLength: 512
           description: Cryptographiclly save hash used for unique identification of document used for binding consent with signature with explicit document. Used hash algorithm is SHA-512 (OID 2.16.840.1.101.3.4.2.3]
           example: 'a93e305306c7a52ac2ccc55b83f197ea8e02b0ce6b317f53ae8e038586f88197'
         document_title:
           type: string
+          maxLength: 255
           description: Title of document, can be empty string
           example: 'Smlouva o smlouvě'
         document_subject:
           type: string
+          maxLength: 255
           description: Subject of document, can be empty string
           example: 'Smlouva s společností ACME'
         document_language:
@@ -2035,6 +2041,7 @@ components:
           example: '2020-06-24T08:54:11+00:00'
         document_author:
           type: string
+          maxLength: 255
           description: Author of document, can be empty string
           example: 'Orange SK'
         document_size:
@@ -2044,7 +2051,7 @@ components:
         document_pages:
           type: string
           description: Number of pages of the signed document
-          example: '15'
+          example: 15
         document_read_by_enduser:
           type: boolean
           description: Flag distiguishing if client has already read document
@@ -2052,6 +2059,7 @@ components:
         document_uri:
           type: string
           format: uri
+          maxLength: 1024
           description: Temporary URI designed to be able to display the document in the IDP authorization flow
           example: 'https://rp.net/documents?document_id=7e766e94-eb62-11ea-adc1-0242ac120002'
 
@@ -2082,14 +2090,18 @@ components:
           example: 1
         document_hash:
           type: string
+          minLength: 512
+          maxLength: 512
           description: Cryptographiclly save hash used for unique identification of document used for binding consent with signature with explicit document. Used hash algorithm is SHA-512 (OID 2.16.840.1.101.3.4.2.3]
           example: 'a93e305306c7a52ac2ccc55b83f197ea8e02b0ce6b317f53ae8e038586f88197'
         document_title:
           type: string
+          maxLength: 255
           description: Title of document, can be empty string
           example: 'Smlouva o smlouvě'
         document_subject:
           type: string
+          maxLength: 255
           description: Subject of document, can be empty string
           example: 'Smlouva s společností ACME'
         document_language:
@@ -2103,6 +2115,7 @@ components:
           example: '2020-06-24T08:54:11+00:00'
         document_author:
           type: string
+          maxLength: 255
           description: Author of document, can be empty string
           example: 'Orange SK'
         document_size:
@@ -2120,6 +2133,7 @@ components:
         document_uri:
           type: string
           format: uri
+          maxLength: 1024
           description: Temporary URI designed to be able to display the document in the IDP authorization flow
           example: 'https://rp.net/documents?document_id=7e766e94-eb62-11ea-adc1-0242ac120002'
 
@@ -2132,9 +2146,12 @@ components:
       properties:
         envelope_name:
           type: string
+          maxLength: 25
           description: Encapsulating name of bulk of documents. MUST be less or equal than 25 characters. Should be unique for given client_id.
         envelope_hash:
           type: string
+          minLength: 512
+          maxLength: 512
           description: Hash of all hashes from sent documents. Calculated as SHA-512(doc1_hash+doc2_hash+...+docn_hash), n <11
         documents:
           type: array
@@ -2238,11 +2255,10 @@ components:
           type: string
           enum:
             - loa3
-            - loa2
           description: >-
             The values determine the level of authentication as well as the possible use of authentication factors.
 
-            The value of ```loa2``` corresponds to one-factor authentication. The value of ```loa3``` corresponds to authentication using two independent verification factors (2FA or also SCA).
+            The value of ```loa3``` corresponds to authentication using two independent verification factors (2FA or also SCA).
           example: 'loa3'
         amr:
           type: array
@@ -2608,13 +2624,11 @@ components:
             type: string
             enum:
               - loa3
-              - loa2
             example: ['loa3']
           description:
             JSON array containing a list of the Authentication Context Class References respective that possible verification levels this OP supports.
 
-            The values determine the level of authentication as well as the possible use of authentication factors. The value of ```loa2``` corresponds
-            to one-factor authentication. The value of ```loa3``` corresponds to authentication using two independent verification factors (2FA or also SCA).
+            The values determine the level of authentication as well as the possible use of authentication factors. The value of ```loa3``` corresponds to authentication using two independent verification factors (2FA or also SCA).
 
         subject_types_supported:
           type: array
@@ -3118,14 +3132,13 @@ components:
             type: string
             enum:
               - loa3
-              - loa2
           description: >-
             Supported requested Authentication Context Class Reference values.
             The parameter represents supported authentication level values.
             The values determine the level of authentication as well as the possible use of authentication factors.
-            The value of ```loa2``` corresponds to one-factor authentication. The value of ```loa3``` corresponds to authentication using two
+            The value of ```loa3``` corresponds to authentication using two
             independent verification factors (2FA or also SCA).
-          example: ['loa2', 'loa3']
+          example: ['loa3']
         initiate_login_uri:
           type: string
           format: uri
@@ -3242,8 +3255,6 @@ components:
         - use
         - kty
         - kid
-        - alg
-        - x5c
       properties:
         alg:
           description: >-
@@ -3772,11 +3783,10 @@ components:
           type: string
           enum:
             - loa3
-            - loa2
           description: >-
             The parameter represents the used authentication level.
 
-            The value of loa2 corresponds to one-factor authentication. The value of loa3 corresponds to authentication using two
+            The value of loa3 corresponds to authentication using two
             independent verification factors (2FA or also SCA).
           example: 'loa3'
         amr:
