@@ -2,9 +2,10 @@
 
 | Version | Note |
 | ------------- |-------------|
-| 1.2.0      | added ```traceId``` for support purposes to all endpoints<br>cleaned up unused components |
-| 1.1.0     | fixed error status code in ```/logout``` endpoint<br>specified the case of JWT object encryption     |
-| 1.0.0 | the first version of the document    |
+| 2.0.0      | Removed ```sid``` from ```/back-channel/logout```<br>First GidHub release. |
+| 1.2.0      | Added ```traceId``` for support purposes to all endpoints<br>Cleaned up unused components |
+| 1.1.0     | Fixed error status code in ```/logout``` endpoint<br>Specified the case of JWT object encryption     |
+| 1.0.0 | The first version of the document    |
 
 **Source material and relevant modifications:**
 

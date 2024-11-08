@@ -1,23 +1,23 @@
 openapi: 3.0.0
 info:
   title: APIs exposed by Bank iD for Identity Providers
-  version: 1.2.3
+  version: 2.0.0
   description: >
     Describes APIs exposed by Bank iD for Identity Providers. Changelog available at [GitHub](https://github.com/BankovniIdentita/bankid-api-docs/tree/main/bankid-for-idp)
 
 paths:
   /back-channel/logout:
-    description: >-
-      Logout endpoint specified in [OpenID.BackChannelLogout](https://openid.net/specs/openid-connect-backchannel-1_0.html).
-
-
-      This specific pathname is RECOMMENDED, exact pathname has to be set in `backchannel_logout_uri` property during dynamic client registration.
-
-
-      Implementors note: it is possible to register this EP with a query parameter containing `state` or similar, which could allow easier pairing of `client_id`
     post:
       tags:
         - Back-Channel Logout
+      description: >-
+        Logout endpoint specified in [OpenID.BackChannelLogout](https://openid.net/specs/openid-connect-backchannel-1_0.html).
+
+
+        This specific pathname is RECOMMENDED, exact pathname has to be set in `backchannel_logout_uri` property during dynamic client registration.
+
+
+        Implementors note: it is possible to register this EP with a query parameter containing `state` or similar, which could allow easier pairing of `client_id`
       operationId: backChannelLogout
       security:
         - {}
@@ -58,11 +58,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/traceId'
   /notify:
-    description: >-
-      Batch notification endpoint which accepts a list of notification tokens. These are mainly claim update notifications.
     post:
       tags:
         - Notifications
+      description: >-
+        Batch notification endpoint which accepts a list of notification tokens. These are mainly claim update notifications.
       operationId: getNotifications
       security:
         - {}
@@ -108,11 +108,11 @@ paths:
                 $ref: '#/components/schemas/traceId'
 
   /user-stat-data:
-    description: >-
-      This endpoint returns statistical data for the purpose of fraud prevetion.
     post:
       tags:
         - User Stat Data
+      description: >-
+        This endpoint returns statistical data for the purpose of fraud prevetion.
       operationId: userStatData
       security:
         - bearerAuth: []
@@ -248,23 +248,21 @@ components:
         idp:
           type: boolean
           description: >-
-            Limit only to IdP records.
+            Limit only to IdP records, where SeP is also IdP.
           example: true
         idpSub:
           type: string
+          maxLength: 255
           description: >-
             Subject Identifier in IdP scheme. Either idpSub or sepSub must be provided.
-            A locally unique and never reassigned identifier within the Issuer for the End-User, which is intended to be consumed by the Client, e.g., 24400320 or AItOawmwtWwcT0k51BayewNvutrJUqsvl6qs7A4.
-            It MUST NOT exceed 255 ASCII characters in length.
-            The sub value is a case sensitive string.
+            A locally unique and never reassigned identifier within the Issuer for the End-User, which is intended to be consumed by the Client, e.g., 24400320 or AItOawmwtWwcT0k51BayewNvutrJUqsvl6qs7A4. The idpSub value is a case sensitive string.
           example: 9456B875-62D3-4533-A502-E05D39936F3A
         sepSub:
           type: string
+          format: uuid
           description: >-
             Subject Identifier in Bank iD scheme. Either idpSub or sepSub must be provided.
-            A locally unique and never reassigned identifier within the Issuer for the End-User, which is intended to be consumed by the Client, e.g., 24400320 or AItOawmwtWwcT0k51BayewNvutrJUqsvl6qs7A4.
-            It MUST NOT exceed 255 ASCII characters in length.
-            The sub value is a case sensitive string.
+            A locally unique and never reassigned identifier within the Issuer for the End-User, which is intended to be consumed by the Client, e.g., 24400320 or AItOawmwtWwcT0k51BayewNvutrJUqsvl6qs7A4. The sepSub value is a case sensitive string.
           example: F932FF05-E04C-4CD1-86E4-CE82F1F51EFB
     UserStatDataResponse:
       description: >-
@@ -293,6 +291,9 @@ components:
           example: 80
         message:
           type: string
+          maxLength: 1024
+          description: Message containing additional information regarding the response.
+          example: idpSup or sepSub must be filled
         authHistory:
           type: array
           items:
@@ -332,6 +333,7 @@ components:
           example: invalid_request
         error_description:
           type: string
+          maxLength: 1024
           description: Additional text description of the error for debugging.
           example: daysBefore is greater than 30
       description: >-
@@ -371,6 +373,7 @@ components:
             What is the original time that this event has happened at
         sub:
           type: string
+          format: uuid
           description: >-
             Affected sub
           example: '9456B875-62D3-4533-A502-E05D39936F3A'
@@ -378,6 +381,7 @@ components:
           type: array
           items:
             type: string
+            format: uuid
           description: >-
             An array of affected client_ids
           example: ['F932FF05-E04C-4CD1-86E4-CE82F1F51EFB']
@@ -454,8 +458,6 @@ components:
         - use
         - kty
         - kid
-        - alg
-        - x5c
       properties:
         alg:
           description: >-
@@ -629,5 +631,4 @@ components:
             previous one.  The key in the first certificate MUST match the public
             key represented by other members of the JWK.
           type: string
-          format: uri
           example: MIICUDCCAbmgAwIBAgIBADANBgkqhkiG9w0BAQsFADBFMQswCQYDVQQGEwJjejEOMAwGA1UECAwFUHJhaGExEDAOBgNVBAoMB0V4YW1wbGUxFDASBgNVBAMMC2V4YW1wbGUuY29tMB4XDTIwMDExNjE2NDExOFoXDTIxMDExNTE2NDExOFowRTELMAkGA1UEBhMCY3oxDjAMBgNVBAgMBVByYWhhMRAwDgYDVQQKDAdFeGFtcGxlMRQwEgYDVQQDDAtleGFtcGxlLmNvbTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEArOEYBRyBhcd6u3phrbU2xvTaBoy6W14CpqqfsBrfsUsuSB+JELBCj3a+zRIvy4EY9cnQbF7cPNxbXdCbGEokAUjIIuVBk/I6XhKRe01vlax82o+eFfIhUfl7Xb2Bx9U3m98Qbt3WNrv+VYJjjFP8HWSsWCHKCazj+yvozjuFXUsCAwEAAaNQME4wHQYDVR0OBBYEFN5SUrsStd4aLhBs+MWGRDxLeUP4MB8GA1UdIwQYMBaAFN5SUrsStd4aLhBs+MWGRDxLeUP4MAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQELBQADgYEAL59fE6itiRrck6Z7RCjwnOnebQJxpoB/L7TUC/aUIXss40mCviBVKD+Hl4+3sGyp4J2LlzzqhFcPgR9NyxQt0bkahJGH0UXvZETJe719UA0kGFrPMdt6ujwB6/rafT6TinzXN0lEEGikersTrh3BR9Hjw+v7nCQ0D5RfuDn6s5s=

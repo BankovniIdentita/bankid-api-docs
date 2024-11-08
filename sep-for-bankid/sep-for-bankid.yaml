@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: APIs exposed by Service Providers for Bank iD
-  version: 1.2.0
+  version: 2.0.0
   description: |
     Describes APIs exposed by Service Providers for Bank iD. Changelog available at [GitHub](https://github.com/BankovniIdentita/bankid-api-docs/tree/main/sep-for-bankid).
 
@@ -206,6 +206,7 @@ components:
           example: https://idp.example.com
         sub:
           type: string
+          format: uuid
           description: >-
             Subject Identifier.
             A locally unique and never reassigned identifier within the Issuer for the End-User, which is intended to be consumed by the Client, e.g., 24400320 or AItOawmwtWwcT0k51BayewNvutrJUqsvl6qs7A4.
@@ -232,11 +233,6 @@ components:
             JWT ID. A unique identifier for the token, which can be used to prevent reuse of the token.
             These tokens MUST only be used once, unless conditions for reuse were negotiated between the parties; any such negotiation is beyond the scope of this specification
           example: 913CC0F7-27BA-40D9-9F4F-8DF74AC3596B
-        sid:
-          type: string
-          description: >-
-            Session ID - String identifier for a Session. This represents a Session of a User Agent or device for a logged-in End-User at an RP. Different sid values are used to identify distinct sessions at an OP. The sid value need only be unique in the context of a particular issuer. Its contents are opaque to the RP. Its syntax is the same as an OAuth 2.0 Client Identifier.
-          example: A13CC0F7-27BA-40D9-9F4F-8DF74AC7596B
         events:
           type: object
           description: Claim whose value is a JSON object containing the member name http://schemas.openid.net/event/backchannel-logout. This declares that the JWT is a Logout Token. The corresponding member value MUST be a JSON object and SHOULD be the empty JSON object {}.
@@ -268,6 +264,7 @@ components:
             What is the original time that this event has happened at
         sub:
           type: string
+          format: uuid
           description: >-
             Affected sub
           example: '9456B875-62D3-4533-A502-E05D39936F3A'
@@ -275,6 +272,7 @@ components:
           type: array
           items:
             type: string
+            format: uuid
           description: >-
             An optional array of affected client_ids
           example: ['F932FF05-E04C-4CD1-86E4-CE82F1F51EFB']
