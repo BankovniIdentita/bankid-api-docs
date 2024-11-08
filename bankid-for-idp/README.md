@@ -2,7 +2,7 @@
 
 | Version | Note |
 | ------------- |-------------|
-| 2.0.0   | Fixed endpoint descriptions. Added string lenghts and formats. ```alg``` and ```x5c``` is not required anymore in JWK. First GitHub release.  |
+| 2.0.0   | Fixed endpoint descriptions. Added string lenghts and formats.<br>```alg``` and ```x5c``` is not required anymore in JWK.<br>First GitHub release.  |
 | 1.2.3   | Fixed ```/notify``` endpoint description and added example.  |
 | 1.2.2   | Fixed content-type to application/json in endpoint ```user-stat-data```<br>Added number of IdP records returned and ability to limit to IdP only records.<br>Fixed wrong body for ```/back-channel/logout``` in documentation  |
 | 1.2.1   | Added endpoint ```user-stat-data```<br>Fixed required fields in ```notify``` response  |
