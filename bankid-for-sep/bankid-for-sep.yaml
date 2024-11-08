@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Bank iD APIs for Service Providers
-  version: 1.3.3
+  version: 2.0.0
   description: |
     Describes APIs exposed by Bank iD for Service Providers. Changelog available at [GitHub](https://github.com/BankovniIdentita/bankid-api-docs/tree/main/bankid-for-sep).
 
@@ -60,7 +60,7 @@ paths:
       tags:
         - Auth
       parameters:
-        - $ref: '#/components/parameters/request_uri'
+        - $ref: '#/components/parameters/auth_request_uri'
         - $ref: '#/components/parameters/auth_redirect_uri'
         - $ref: '#/components/parameters/auth_client_id'
         - $ref: '#/components/parameters/auth_response_type'
@@ -76,7 +76,6 @@ paths:
         - $ref: '#/components/parameters/auth_ui_locales'
         - $ref: '#/components/parameters/auth_code_challenge'
         - $ref: '#/components/parameters/auth_code_challenge_method'
-        - $ref: '#/components/parameters/auth_claims'
         - $ref: '#/components/parameters/auth_bank_id'
         - $ref: '#/components/parameters/auth_trace_id'
 
@@ -186,26 +185,12 @@ paths:
         This request authenticates the user and returns tokens to the client application as a part of the callback response.
       tags:
         - Auth
-      parameters:
-        - $ref: '#/components/parameters/request_uri'
-        - $ref: '#/components/parameters/auth_redirect_uri'
-        - $ref: '#/components/parameters/auth_client_id'
-        - $ref: '#/components/parameters/auth_response_type'
-        - $ref: '#/components/parameters/auth_id_token_hint'
-        - $ref: '#/components/parameters/auth_nonce'
-        - $ref: '#/components/parameters/auth_state'
-        - $ref: '#/components/parameters/auth_scope'
-        - $ref: '#/components/parameters/auth_display'
-        - $ref: '#/components/parameters/auth_prompt'
-        - $ref: '#/components/parameters/auth_acr_values'
-        - $ref: '#/components/parameters/auth_max_age'
-        - $ref: '#/components/parameters/auth_response_mode'
-        - $ref: '#/components/parameters/auth_ui_locales'
-        - $ref: '#/components/parameters/auth_code_challenge'
-        - $ref: '#/components/parameters/auth_code_challenge_method'
-        - $ref: '#/components/parameters/auth_claims'
-        - $ref: '#/components/parameters/auth_bank_id'
-        - $ref: '#/components/parameters/auth_trace_id'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+                $ref: '#/components/schemas/AuthRequest'
 
       callbacks:
         Login-Flow-Success:
@@ -498,11 +483,6 @@ paths:
               description: Unique ID for each API call for support purposes.
               schema:
                 $ref: '#/components/schemas/traceId'
-          content:
-            text/html:
-              schema:
-                description: Default logout page Bank iD.
-                type: string
         '404':
           description: The requested resource doesn't exist.
           headers:
@@ -523,16 +503,18 @@ paths:
         A Service provider can notify the Bank iD that the End-User has logged out of the site and might want to log out of the Service provider`s application as well.
         In this case, the Bank iD, after having logged the End-User out of the Bank iD, redirects the End-User's User Agent to the Service provider application's logout endpoint URL.
         This URL is normally obtained via the end_session_endpoint element of the Bank iD's Discovery response.
-
       tags:
         - Token management
       externalDocs:
         description: OpenID Connect Session Management 1.0 - draft 28
         url: https://openid.net/specs/openid-connect-session-1_0.html
-      parameters:
-        - $ref: '#/components/parameters/logout_id_token_hint'
-        - $ref: '#/components/parameters/end_session_post_logout_redirect_uri'
-        - $ref: '#/components/parameters/auth_state_unreq'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LogoutObjectRequest'
+
       callbacks:
         Logout-Flow-Success:
           '{$request.query.post_logout_redirect_uri}':
@@ -558,11 +540,7 @@ paths:
               description: Unique ID for each API call for support purposes.
               schema:
                 $ref: '#/components/schemas/traceId'
-          content:
-            text/html:
-              schema:
-                description: Default logout page Bank iD.
-                type: string
+
         '404':
           description: The requested resource doesn't exist.
           headers:
@@ -815,20 +793,17 @@ paths:
         **Things to watch out for:**
 
           - ```structured_scope``` MUST contain either ```documentObject```, ```documentObjects``` or ```signObject```
-          - ```documentObjects``` MUST contain at least one document, defined ```priority``` and ```envelope_name```, which is limited to 25 characters
-          - ```signObject``` MUST contain at least one field array element
+          - ```documentObjects``` MUST contain at least one document, defined ```priority``` and 
+           ```signObject``` MUST contain at least one field array element
           - elements outside the ```structured_scope``` (```response_type```, ```scope```, ```client_id```, …) contain common values as in the 
             authentication flow. The values must correspond to the configuration of the application in the development portal.
           - the ```document_id``` element can be any string, doesn't have to match the ```documentId``` value from the metadata of the PDF document
           - the ```document_hash``` element contains a bytearray hash of the content of the PDF document. The hash algorithm used 
             MUST be specified in the element ```hash_alg``` (Bank iD recommends using the SHA512 algorithm, see JSON example).
-          - the ```document_uri``` element should point to where the document can be downloaded. 
-            **In the current version it is mandatory, but the site is not validated!**
+          - the ```document_uri``` could be any uri. **Even though it is mandatory, it's not beind validated!**
           - fields in the ```signObject``` element MUST have a defined ```priority``` that is unique as a number.
           - If ```sign_area``` and ```sign_field``` are not present, signature will be non-visual. 
-          - If both ```sign_area``` and ```sign_field``` are in request, ```sign_field``` will have priority for signature and ```sign_area``` will be ignored.
-          - the maximum size of the ```key``` value in the ```signObject``` is 255 characters
-          - the maximum size of the ```value``` element in ```signObject``` is 1024 characters
+          - If both ```sign_area``` and ```sign_field``` are in request, ```sign_field``` will have priority for visual signature and ```sign_area``` will be ignored.
       security:
         - AccessTokenAuth: []
         - {}
@@ -888,7 +863,7 @@ paths:
         Resource for initiation of authorization flow on object registered on Authorization Server side
         Returns redirect for end user to authorize object on Authorization Server
       parameters:
-        - $ref: '#/components/parameters/request_uri'
+        - $ref: '#/components/parameters/auth_request_uri'
         - $ref: '#/components/parameters/redirect_uri'
       responses:
         '200':
@@ -1182,40 +1157,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BankList'
-
-  /session-iframe:
-    get:
-      description: >-
-        OP iframe that supports cross-origin communications for session state information with the RP Client, using the HTML5 postMessage API.
-      tags:
-        - Single sign-on
-      summary: Iframe to enable SSO across different Service Providers
-      externalDocs:
-        description: OpenID Session Management - OP iframe
-        url: https://openid.net/specs/openid-connect-session-1_0.html#OPiframe
-      responses:
-        '200':
-          description: HTML page with iframe content
-          headers:
-            traceId:
-              description: Unique ID for each API call for support purposes.
-              schema:
-                $ref: '#/components/schemas/traceId'
-          content:
-            text/html:
-              schema:
-                type: string
-        '400':
-          description: 'Server error'
-          headers:
-            traceId:
-              description: Unique ID for each API call for support purposes.
-              schema:
-                $ref: '#/components/schemas/traceId'
-          content:
-            text/html:
-              schema:
-                type: string
 
 components:
   headers:
@@ -1558,13 +1499,12 @@ components:
         The parameter represents the required authentication level. The application should only request values configured in the developer portal (**Enable 2FA by default** switch in configuration).
 
         The values determine the level of authentication as well as the possible use of authentication factors.
-        The value of ```loa2``` corresponds to one-factor authentication. The value of ```loa3``` corresponds to authentication
+        The value of ```loa3``` corresponds to authentication
         using two independent verification factors (2FA or also SCA).
       schema:
         type: string
         default: loa3
         enum:
-          - loa2
           - loa3
         example: 'loa3'
     auth_code_challenge:
@@ -1722,7 +1662,7 @@ components:
         type: string
         format: uri
         example: https://idp.example.com/error123
-    request_uri:
+    auth_request_uri:
       name: request_uri
       in: query
       description: >-
@@ -1732,20 +1672,6 @@ components:
         type: string
         format: uri
         example: 'https://rp.example.com/request/13CACDFD-884C-4E57-B78D-90B69A96C86A.jwt'
-    auth_claims:
-      name: claims
-      in: query
-      deprecated: true
-      required: false
-      description: >
-        List of requested Claims from userinfo EP or id_token. Standard Claims defined in [OpenID Core - Claims](https://openid.net/specs/openid-connect-core-1_0.html#Claims)
-      schema:
-        type: object
-        properties:
-          userinfo:
-            $ref: '#/components/schemas/request_claims_param'
-          id_token:
-            $ref: '#/components/schemas/request_claims_param'
     auth_bank_id:
       name: bank_id
       in: query
@@ -1769,8 +1695,8 @@ components:
       description: Unique ID for each API call for support purposes.
       schema:
         type: string
-        pattern: '^[a-zA-Z0-9]{16}$'
-        example: 26f6ea6095205ebc
+        pattern: '^[a-zA-Z0-9]{32}$'
+        example: 26f6ea6095205ebc26f6ea6095205ebc
 
   requestBodies:
     RevocationRequest:
@@ -1833,7 +1759,7 @@ components:
         state:
           $ref: '#/components/parameters/auth_state'
         request_uri:
-          $ref: '#/components/parameters/request_uri'
+          $ref: '#/components/parameters/auth_request_uri'
       example:
         state: 'lwuwppIWL9F32SZDULd-sdfgsdfgds234sfd'
         request_uri: 'https://rp.example.com/request/13CACDFD-884C-4E57-B78D-90B69A96C86A.jwt'
@@ -2373,6 +2299,34 @@ components:
             title: currency
             example: 'CZK'
 
+    LogoutObjectRequest:
+      type: object
+      required:
+        - id_token_hint
+      properties:
+        id_token_hint:
+          description: >-
+            ID Token previously issued by the Authorization Server being passed as a hint about 
+            the End-User's current or past authenticated session with the Client. If the End-User 
+            identified by the ID Token is logged in or is logged in by the request, then the 
+            Authorization Server returns a positive response; otherwise, it SHOULD return an error, 
+            such as login_required. When possible, an id_token_hint SHOULD be present when 
+            prompt=none is used and an invalid_request error MAY be returned if it is not; 
+            however, the server SHOULD respond successfully when possible, even if it is not present. 
+            The Authorization Server need not be listed as an audience of the ID Token when 
+            it is used as an id_token_hint value.
+          type: string
+          example: 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjdlOGFkZmMzMjU1OTEyNzI0ZDY4NWZmYmIwOThjNDEyIiwidHlwIjoiSldUIn0.eyJuYmYiOjE0OTE3NjUzMjEsImV4cCI6MTQ5MTc2'
+        post_logout_redirect_uri:
+          description: URL to which the RP is requesting that the End-User's User Agent be redirected after a logout has been performed. The value MUST have been previously registered with the OP.
+          type: string
+          format: uri
+          example: https://rp.example.org/logout
+        state:
+          description: state used in the authentication request
+          type: string
+          example: 'hlkajhsdfiosuyvzxlkjhcvjasdfioyu234'
+
     RequestObjectRequest:
       type: object
       required:
@@ -2423,12 +2377,11 @@ components:
             
             
             The values determine the level of authentication as well as the possible use of authentication factors.
-            The value of ```loa2``` corresponds to one-factor authentication. The value of ```loa3``` corresponds to authentication
+            The value of ```loa3``` corresponds to authentication
             using two independent verification factors (2FA or also SCA).
           type: string
           default: loa3
           enum:
-            - loa2
             - loa3
           example: 'loa3'
         response_type:
@@ -2664,16 +2617,12 @@ components:
                 type: string
                 description: >-
                   Key for value, can be displayed to end-user as label.
-
-                  The maximum size of the ```key``` is 255 characters!
                 example: 'Consent'
                 maxLength: 255
               value:
                 type: string
                 description: >-
                   Value for user authorization, must be displayed to end-user
-
-                  The maximum size of the ```value``` is 1024 characters!
                 example: 'I consent with sending marketing messages to my email and telephone'
                 maxLength: 1024
               priority:
@@ -2736,9 +2685,12 @@ components:
           description: >-
             Id of document can be any string, doesn't have to match the ```documentId``` value from the metadata of the PDF document.
           type: string
+          maxLength: 255
           example: '7159534b-3b88-4f29-866b-9e83489d3053'
         document_hash:
           type: string
+          maxLength: 512
+          minLength: 512
           description: >-
             Cryptographically save hash used for unique identification of document used for binding consent with signature 
             with explicit document.
@@ -2751,10 +2703,12 @@ components:
           example: '2.16.840.1.101.3.4.2.3'
         document_title:
           type: string
+          maxLength: 255
           description: Title of document, can be empty string. Unsupported characters are "#" "%" "{" "}" "<" ">" "*" "?" "$" “\u0027” “\u0022” "+" "`" "|" "=".
           example: 'Smlouva o smlouvě'
         document_subject:
           type: string
+          maxLength: 255
           description: Subject of document, can be empty string. Unsupported characters are "#" "%" "{" "}" "<" ">" "*" "?" "$" “\u0027” “\u0022” "+" "`" "|" "=".
           example: 'Smlouva se společností ACME'
         document_language:
@@ -2777,6 +2731,8 @@ components:
         document_uri:
           type: string
           format: uri
+          maxLength: 1024
+          deprecated: true
           description: >-
             URI used in ID token to return location of signed document. **If sent in request it will be ignored by Bank iD**
           example: 'https://rp.net/documents?document_id=7e766e94-eb62-11ea-adc1-0242ac120002'
@@ -2858,6 +2814,7 @@ components:
           description: >-
             Id of document can be any string, doesn't have to match the ```documentId``` value from the metadata of the PDF document.
           type: string
+          maxLength: 255
           example: '7159534b-3b88-4f29-866b-9e83489d3053'
         document_priority:
           type: integer
@@ -2865,6 +2822,8 @@ components:
           example: 1
         document_hash:
           type: string
+          maxLength: 512
+          minLength: 512
           description: Cryptographically save hash used for unique identification of document used for binding consent with signature with explicit document. Used hash algorithm is SHA-512 (OID 2.16.840.1.101.3.4.2.3]
           example: 'a93e305306c7a52ac2ccc55b83f197ea8e02b0ce6b317f53ae8e038586f88197'
         hash_alg:
@@ -2875,10 +2834,12 @@ components:
           example: '2.16.840.1.101.3.4.2.3'
         document_title:
           type: string
+          maxLength: 255
           description: Title of document, can be empty string. Unsupported characters are "#" "%" "{" "}" "<" ">" "*" "?" "$" “\u0027” “\u0022” "+" "`" "|" "=".
           example: 'Smlouva o smlouvě'
         document_subject:
           type: string
+          maxLength: 255
           description: Subject of document, can be empty string. Unsupported characters are "#" "%" "{" "}" "<" ">" "*" "?" "$" “\u0027” “\u0022” "+" "`" "|" "=".
           example: 'Smlouva s společností ACME'
         document_language:
@@ -2892,6 +2853,7 @@ components:
           example: '2020-06-24T08:54:11+00:00'
         document_author:
           type: string
+          maxLength: 255
           description: Author of document, can be empty string. In case of PDF 2.0 is taken from XMP data.
           example: 'Orange SK'
         document_size:
@@ -2908,6 +2870,8 @@ components:
         document_uri:
           type: string
           format: uri
+          maxLength: 1024
+          deprecated: true
           description: Temporary URI designed to be able to display the document in the IDP authorization flow
           example: 'https://rp.net/documents?document_id=7e766e94-eb62-11ea-adc1-0242ac120002'
         sign_area:
@@ -3006,6 +2970,7 @@ components:
           type: string
           description: Subject Identifier, as specified in Section 2 of [OpenID.Core].
         outdated_subs:
+          deprecated: true
           description: >-
             The outdated_subs field contains all identifiers from the associated identities that were ever provided to the application via Bank iD.
           type: array
@@ -3050,7 +3015,6 @@ components:
           type: string
           enum:
             - loa3
-            - loa2
           description: >-
             Authentication Context Class Reference. String specifying an Authentication Context Class Reference value that identifies the Authentication Context Class that the authentication 
             performed satisfied. The value "0" indicates the End-User authentication did not meet the requirements of ISO/IEC 29115 [ISO29115] level 1. Authentication using a long-lived browser 
@@ -3462,8 +3426,7 @@ components:
             type: string
             enum:
               - loa3
-              - loa2
-            example: [ 'loa2', 'loa3' ]
+            example: [ 'loa3' ]
           description: JSON array containing a list of the Authentication Context Class References that this OP supports.
         subject_types_supported:
           type: array
@@ -3611,6 +3574,7 @@ components:
         backchannel_logout_session_supported:
           type: boolean
           description: Boolean value specifying whether the OP can pass a sid (session ID) Claim in the Logout Token to identify the RP session with the OP. If supported, the sid Claim is also included in ID Tokens issued by the OP. If omitted, the default value is false.
+          example: false
         claims_supported:
           type: array
           items:
@@ -3639,6 +3603,7 @@ components:
           description: >-
             Boolean value specifying whether the OP can pass iss (issuer) and sid (session ID) query parameters to identify the RP session with the OP when the frontchannel_logout_uri is used. 
             If supported, the sid Claim is also included in ID Tokens issued by the OP. If omitted, the default value is false.
+          example: false
 
     JWKS:
       description: JSONWebKeySet JSON web key set
@@ -3660,8 +3625,6 @@ components:
         - use
         - kty
         - kid
-        - alg
-        - x5c
       properties:
         alg:
           description: >-
@@ -3947,6 +3910,169 @@ components:
             refresh_token: 'A9B54609-FF9E-42F0-B089-89E1E73E224F'
             scope: 'openid offline_access profile.name profile.addresses'
 
+    AuthRequest:
+      title: Auth Request
+      required:
+        - client_id
+        - state
+        - nonce
+        - scope
+        - redirect_uri
+      properties:
+          request_uri:
+            type: string
+            format: uri
+            description: >-
+              This parameter enables OpenID Connect requests to be passed by reference, rather than by value.
+              The `request_uri` value is a URL using the https scheme referencing a resource containing a Request Object value, which is a JWT containing the request parameters.
+            example: 'https://rp.example.com/request/13CACDFD-884C-4E57-B78D-90B69A96C86A.jwt'
+          redirect_uri:
+             type: string
+             format: uri
+             description: >-
+                If the "redirect_uri" parameter was included in the authorization request. Their values MUST be identical.
+             example: 'https://rp.example.com/callback'
+          client_id:
+            type: string
+            format: uuid
+            example: 'A9B54609-FF9E-42F0-B089-89E1E73E224F'
+          response_type:
+            type: string
+            enum:
+              - code
+              - token
+          id_token_hint:
+            description: >-
+              ID Token previously issued by the Authorization Server being passed as a hint about the End-User's current or past authenticated session with the Client. If the End-User 
+              identified by the ID Token is logged in or is logged in by the request, then the Authorization Server returns a positive response; otherwise, it SHOULD return an error, 
+              such as login_required. When possible, an id_token_hint SHOULD be present when prompt=none is used and an invalid_request error MAY be returned if it is not; 
+              however, the server SHOULD respond successfully when possible, even if it is not present.   The Authorization Server need not be listed as an audience of the ID Token when 
+              it is used as an id_token_hint value.
+              In case of SIGN service, Authorization Server compares sub from supplied id_token_hint and ends up with error in case of mismatch.
+            type: string
+            example: 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjdlOGFkZmMzMjU1OTEyNzI0ZDY4NWZmYmIwOThjNDEyIiwidHlwIjoiSldUIn0.eyJuYmYiOjE0OTE3NjUzMjEsImV4cCI6MTQ5MTc2'
+          nonce:
+            type: string
+            example: 'nxrt-084-222_wdutKuOasdj'
+          state:
+            type: string
+            example: 'asdfask3452lkjhasdflkahfdsjkjfhkl2345lk'
+          scope:
+            description: OpenID Connect requests MUST contain the openid scope value. If the openid scope value is not present, the behavior is entirely unspecified. Other scope values MAY be present. Scope values used that are not understood by an implementation SHOULD be ignored. See Sections 5.4 and 11 for additional scope values defined by this specification.
+            type: string
+            example: 'openid profile.name profile.addresses'
+          display:
+            description: >-
+              ASCII string value that specifies how the Authorization Server displays the authentication and consent user interface pages to the End-User. The defined values are:
+
+              * page - The Authorization Server SHOULD display the authentication and consent UI consistent with a full User Agent page view. If the display parameter is not specified, 
+                  this is the default display mode.
+
+              * popup - The Authorization Server SHOULD display the authentication and consent UI consistent with a popup User Agent window. The popup User Agent window should be of an appropriate 
+                  size for a login-focused dialog and should not obscure the entire window that it is popping up over.
+
+              * touch - The Authorization Server SHOULD display the authentication and consent UI consistent with a device that leverages a touch interface.
+
+              The Authorization Server MAY also attempt to detect the capabilities of the User Agent and present an appropriate display.
+            type: string
+            enum:
+              - page
+              - popup
+              - touch
+            example: 'page'
+          prompt:
+            description: >-
+              Space delimited, case sensitive list of ASCII string values that specifies whether the 
+              Authorization Server prompts the End-User for reauthentication and consent. The defined values are:
+
+              * none - The Authorization Server MUST NOT display any authentication or consent user 
+                  interface pages. An error is returned if an End-User is not already authenticated 
+                  or the Client does not have pre-configured consent for the requested Claims or does 
+                  not fulfill other conditions for processing the request. The error code will 
+                  typically be login_required, interaction_required, or another code defined in 
+                  Section 3.1.2.6. This can be used as a method to check for existing authentication 
+                  and/or consent.
+
+              * login - The Authorization Server SHOULD prompt the End-User for reauthentication. 
+                  If it cannot reauthenticate the End-User, it MUST return an error, typically login_required.
+
+              * consent - The Authorization Server SHOULD prompt the End-User for consent before 
+                  returning information to the Client. If it cannot obtain consent, it MUST return 
+                  an error, typically consent_required.
+
+              The prompt parameter can be used by the Client to make sure that the End-User is still 
+              present for the current session or to bring attention to the request. If this parameter 
+              contains none with any other value, an error is returned.
+              Definition of OpenID Connect Core [OpenID Connect Core](https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest)
+              contain possible values none, login, consent, select_account, but we define subset because of security reasons.
+            type: array
+            items:
+              type: string
+              enum:
+               - none
+               - login
+               - consent
+            example: [none login]
+          acr_values:
+            type: string
+            enum:
+              - loa3
+            example: 'loa3'
+          max_age:
+            description: >-
+              Maximum possible Authentication Age. Specifies the allowable elapsed time in seconds since the last time the OP actively authenticated the End-User.
+
+              This parameter is not intended to request the length of validity of issued tokens. Currently, some IDPs do not support this parameter, and the current authentication validity period is limited only by the validity of the tokens.
+
+              The validity of Bank iD tokens is listed here 
+              [Tokens used in the Bank iD solution](https://developer.bankid.cz/docs/apis_sep#tokens-used-in-the-bankid-solution)
+            type: integer
+            format: int64
+            example: '6000'
+          response_mode:
+            description: >-
+              Informs the Authorization Server of the mechanism to be used for returning parameters from the Authorization Endpoint. This use of this parameter is NOT RECOMMENDED when the Response Mode that would be requested is the default mode specified for the Response Type.
+            type: string
+            enum:
+              - query
+            example: 'query'
+          ui_locales:
+            description: >-
+              End-User's preferred languages and scripts for the user interface, represented as a space-separated list of BCP47 [RFC5646] language tag values, ordered by preference. 
+              For instance, the value "fr-CA fr en" represents a preference for French as spoken in Canada, then French (without a region designation), followed by English 
+              (without a region designation). An error SHOULD NOT result if some or all of the requested locales are not supported by the OpenID Provider.
+            type: string
+            example: 'fr-CA.UTF-8'
+          code_challenge:
+            description: >-
+              This parameter is used only for `code` flow with PKCE - [RFC7636](https://tools.ietf.org/html/rfc7636).
+              Format of value is defined in [RFC7636 - 4.2.  Client Creates the Code Challenge](https://tools.ietf.org/html/rfc7636#section-4.2)
+              extention of [RFC6749 - The OAuth 2.0 Authorization Framework](https://tools.ietf.org/html/rfc6749).
+            type: string
+            example: uctxl8ZkAqEj0nsxFi8l
+          code_challenge_method:
+            description: >-
+              This parameter is used only for `code` flow with PKCE - [RFC7636](https://tools.ietf.org/html/rfc7636).
+              If the client is capable of using "S256", it MUST use "S256", as "S256" is Mandatory To Implement (MTI) on the server.  Clients are
+              permitted to use "plain" only if they cannot support "S256" for some technical reason and know via out-of-band configuration that the server supports "plain".
+              Format of value is defined in [RFC7636 - 4.2.  Client Creates the Code Challenge](https://tools.ietf.org/html/rfc7636#section-4.2)
+              extension of [RFC6749 - The OAuth 2.0 Authorization Framework](https://tools.ietf.org/html/rfc6749).
+            type: string
+            enum:
+              - plain
+              - S256
+          bank_id:
+            description: >-
+              Bank ID acquired from the Bank Listing API. This is used to skip the bank selection screen and redirect the end-user straight to the Bank.
+            type: string
+            format: uuid
+            example: 1441860F-61D9-4A40-B634-EF741ADCB0A7
+          trace_id:
+            description: Unique ID for each API call for support purposes.
+            type: string
+            pattern: '^[a-zA-Z0-9]{32}$'
+            example: 26f6ea6095205ebc26f6ea6095205ebc
+
     TokenCommonPartRequest:
       oneOf:
         - $ref: '#/components/schemas/ClientSecretPost'
@@ -4162,7 +4288,6 @@ components:
       type: object
       required:
         - iss
-        - sid
         - aud
         - exp
         - iat
@@ -4178,17 +4303,13 @@ components:
           type: string
           description: Subject Identifier, as specified in Section 2 of [OpenID.Core].
         outdated_subs:
+          deprecated: true
           description: >-
             The outdated_subs field contains all identifiers from the associated identities that were ever provided to the application via Bank iD.
           type: array
           items:
             type: string
           example: ["4b03e720-4e7b-4ea8-bb2f-7d2ec11c6812", "a2fd8180-30e6-4550-afef-53c436bba3cb"]
-        sid:
-          type: string
-          description: >-
-            Session ID - String identifier for a Session. This represents a Session of a User Agent or device for a logged-in End-User at an RP. Different sid values are used to identify
-            distinct sessions at an OP. The sid value need only be unique in the context of a particular issuer. Its contents are opaque to the RP. Its syntax is the same as an OAuth 2.0 Client Identifier.
         aud:
           type: string
           description: Audience(s), as specified in Section 2 of [OpenID.Core].
@@ -4228,7 +4349,6 @@ components:
         acr:
           type: string
           enum:
-            - 'loa2'
             - 'loa3'
           description: >-
             Authentication Context Class Reference. String specifying an Authentication Context Class Reference value that identifies the Authentication Context Class that the authentication 
@@ -4454,106 +4574,6 @@ components:
           description: >
             Time the End-User's information was last updated. Its value is a JSON number representing the number of seconds from 1970-01-01T0:0:0Z as measured in UTC until the date/time.
           example: 1650887066
-
-    request_claims_param:
-      type: object
-      properties:
-        name:
-          allOf: [ { $ref: '#/components/schemas/claims_generic_types' } ]
-          description: >
-            End-User's full name in displayable form including all name parts, possibly including titles and suffixes, ordered according to the End-User's locale and preferences.
-        given_name:
-          allOf: [ { $ref: '#/components/schemas/claims_generic_types' } ]
-          description: >
-            Given name(s) or first name(s) of the End-User. Note that in some cultures, people can have multiple given names; all can be present, with the names being separated by space characters.
-        family_name:
-          allOf: [ { $ref: '#/components/schemas/claims_generic_types' } ]
-          description: >
-            Surname(s) or last name(s) of the End-User. Note that in some cultures, people can have multiple family names or no family name; all can be present, with the names being separated by space characters.
-        middle_name:
-          allOf: [ { $ref: '#/components/schemas/claims_generic_types' } ]
-          description: >
-            Middle name(s) of the End-User. Note that in some cultures, people can have multiple middle names; all can be present, with the names being separated by space characters. Also note that in some cultures, middle names are not used.
-        nickname:
-          allOf: [ { $ref: '#/components/schemas/claims_generic_types' } ]
-          description: >
-            Casual name of the End-User that may or may not be the same as the given_name. For instance, a nickname value of Mike might be returned alongside a given_name value of Michael.
-        preferred_username:
-          allOf: [ { $ref: '#/components/schemas/claims_generic_types' } ]
-          description: >
-            Shorthand name by which the End-User wishes to be referred to at the RP, such as `janedoe` or `j.doe`. This value MAY be any valid JSON string including special characters such as @, /, or whitespace. The RP MUST NOT rely upon this value being unique.
-        title_prefix:
-          allOf: [ { $ref: '#/components/schemas/claims_generic_types' } ]
-          description: >
-            "End-User's title prefix."
-        title_suffix:
-          allOf: [ { $ref: '#/components/schemas/claims_generic_types' } ]
-          description: >
-            "End-User's title suffix."
-        email:
-          allOf: [ { $ref: '#/components/schemas/claims_generic_types' } ]
-          description: >
-            End-User's preferred e-mail address. Its value MUST conform to the RFC 5322 [RFC5322] addr-spec syntax. **The API consumer MUST NOT rely upon this value being unique.**
-        email_verified:
-          allOf: [ { $ref: '#/components/schemas/claims_generic_types' } ]
-          description: >
-            True if the End-User's e-mail address has been verified; otherwise false. When this Claim Value is true, 
-            this means that the OP took affirmative steps to ensure that this e-mail address was controlled by the End-User at the time the verification was performed. 
-            The means by which an e-mail address is verified is context-specific, and dependent upon the trust framework or contractual agreements within which the parties are operating.
-        gender:
-          allOf: [ { $ref: '#/components/schemas/claims_generic_types' } ]
-          description: >
-            End-User's gender. Values defined by this specification are `female` and `male`. Other values MAY be used when neither of the defined values are applicable.
-        birthdate:
-          allOf: [ { $ref: '#/components/schemas/claims_generic_types' } ]
-          description: >
-            End-User's birthday, represented as an ISO 8601:2004 [ISO8601‑2004] YYYY-MM-DD format. 
-            The year MAY be 0000, indicating that it is omitted. To represent only the year, YYYY format is allowed. 
-            Note that depending on the underlying platform's date related function, providing just year can result in varying month and day, 
-            so the implementers need to take this factor into account to correctly process the dates.
-        zoneinfo:
-          allOf: [ { $ref: '#/components/schemas/claims_generic_types' } ]
-          description: >
-            String from zoneinfo [zoneinfo] time zone database representing the End-User's time zone. For example, `Europe/Paris` or `America/Los_Angeles`.
-        locale:
-          allOf: [ { $ref: '#/components/schemas/claims_generic_types' } ]
-          description: >
-            End-User's locale, represented as a BCP47 [RFC5646] language tag. 
-            This is typically an ISO 639-1 Alpha-2 [ISO639‑1] language code in lowercase and an ISO 3166-1 Alpha-2 [ISO3166‑1] country code in uppercase, 
-            separated by a dash. For example, en-US or fr-CA. As a compatibility note, some implementations have used an underscore as the separator 
-            rather than a dash, for example, en_US; Relying Parties MAY choose to accept this locale syntax as well.
-        phone_number:
-          allOf: [ { $ref: '#/components/schemas/claims_generic_types' } ]
-          description: >
-            End-User's preferred telephone number. E.164 [E.164] is RECOMMENDED as the format of this Claim, for example, +1 (425) 555-1212 or +56 (2) 687 2400.
-            If the phone number contains an extension, it is RECOMMENDED that the extension be represented using the RFC 3966 [RFC3966] extension syntax,
-            for example, +1 (604) 555-1234;ext=5678.
-        phone_number_verified:
-          allOf: [ { $ref: '#/components/schemas/claims_generic_types' } ]
-          description: >
-            True if the End-User's phone number has been verified; otherwise false. 
-            When this Claim Value is true, this means that the OP took affirmative steps to ensure that this phone number was controlled by the End-User 
-            at the time the verification was performed. The means by which a phone number is verified is context-specific, and dependent upon the trust 
-            framework or contractual agreements within which the parties are operating. When true, the phone_number Claim MUST be in E.164 format and any 
-            extensions MUST be represented in RFC 3966 format.
-        updated_at:
-          allOf: [ { $ref: '#/components/schemas/claims_generic_types' } ]
-          description: >
-            Time the End-User's information was last updated. Its value is a JSON number representing the number of seconds from 1970-01-01T0:0:0Z as measured in UTC until the date/time.
-
-    claims_generic_types:
-      type: object
-      properties:
-        essential:
-          type: boolean
-          description: >
-            Client indicate that claim is essential.
-          example: true
-        purpose:
-          type: string
-          description: >
-            Short description why Client required claim from End-User information. Used for better UX and understanding consent screen by End-User.
-          example: To make communication look more personal
 
     BankList:
       type: object
