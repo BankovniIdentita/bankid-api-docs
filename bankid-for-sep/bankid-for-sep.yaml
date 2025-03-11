@@ -1068,72 +1068,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/traceId'
 
-  /verification:
-    get:
-      tags:
-        - SIGN
-      summary: Begin PDF verification and acquire upload_uri
-      security:
-        - {}
-      parameters:
-        - $ref: '#/components/parameters/document_id'
-      responses:
-        '201':
-          description: Verification request created
-          headers:
-            traceId:
-              description: Unique ID for each API call for support purposes.
-              schema:
-                $ref: '#/components/schemas/traceId'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/VerificationUploadResponse'
-        '400':
-          description: Request has invalid parameters
-          headers:
-            traceId:
-              description: Unique ID for each API call for support purposes.
-              schema:
-                $ref: '#/components/schemas/traceId'
-    post:
-      tags:
-        - SIGN
-      summary: Verify PDF that has already been uploaded
-      description: >
-        Resource provides possibility to verify signature of document on Bank iD and provide authoritative response on signature validity
-      security:
-        - {}
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/VerificationRequest'
-      responses:
-        '200':
-          description: Document has valid signature
-          headers:
-            traceId:
-              description: Unique ID for each API call for support purposes.
-              schema:
-                $ref: '#/components/schemas/traceId'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/VerificationResponse'
-        '400':
-          description: >-
-            The document has the wrong structure or metadata. The request cannot be processed.
-          headers:
-            traceId:
-              description: Unique ID for each API call for support purposes.
-              schema:
-                $ref: '#/components/schemas/traceId'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaTypeError'
-
-
   /api/v1/banks:
     get:
       description: >-
@@ -2545,60 +2479,6 @@ components:
           type: string
           description: URL for end-user redirect to authorization server
           example:
-
-    VerificationUploadResponse:
-      type: object
-      properties:
-        request_id:
-          type: string
-          description: Identification of verification process.
-          example: "12345xzxxfd"
-        upload_uri:
-          type: string
-          example: 'https://www.bankid.cz/api/docuument/b1f0c5da-fcf4-456c-8b4a-543aea4819e1'
-
-    VerificationRequest:
-      type: object
-      properties:
-        request_id:
-          type: string
-          description: Identification of verification process
-          example: "12345xzxxfd"
-
-    VerificationResponse:
-      type: object
-      properties:
-        signatures:
-          type: array
-          description: List of electronic signatures in the document
-          items:
-            $ref: '#/components/schemas/Signature'
-
-    Signature:
-      description: An element that includes the metadata of a single signature from a verified document.
-      type: object
-      properties:
-        revision:
-          description: Revision of the document to which the signature belongs.
-          type: integer
-          example: 1
-        signature_name:
-          description: The name of the signature field (also as a unique identifier for the field).
-          type: string
-          example: "Tenant's signature id 00145"
-        is_bankid:
-          description: The signature was created via Bank iD.
-          type: boolean
-          example: true
-        valid:
-          description: True if the signature is valid.
-          type: boolean
-          example: true
-      required:
-        - revision
-        - signature_name
-        - is_bankid
-        - valid
 
     signObject:
       type: object
