@@ -2016,8 +2016,8 @@ components:
           example: '7159534b-3b88-4f29-866b-9e83489d3053'
         document_hash:
           type: string
-          minLength: 512
-          maxLength: 512
+          minLength: 128
+          maxLength: 128
           description: Cryptographiclly save hash used for unique identification of document used for binding consent with signature with explicit document. Used hash algorithm is SHA-512 (OID 2.16.840.1.101.3.4.2.3]
           example: 'a93e305306c7a52ac2ccc55b83f197ea8e02b0ce6b317f53ae8e038586f88197'
         document_title:
