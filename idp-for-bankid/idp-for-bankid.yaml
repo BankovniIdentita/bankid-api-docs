@@ -2147,7 +2147,7 @@ components:
         envelope_name:
           type: string
           maxLength: 25
-          description: Encapsulating name of bulk of documents. MUST be less or equal than 25 characters. Should be unique for given client_id.
+          description: Encapsulating name of bulk of documents. MUST be less or equal than 25 characters.
         envelope_hash:
           type: string
           minLength: 512
