@@ -4,12 +4,13 @@ Banks are required to implement APIs that are specified in this document, as tha
 
 ## Changes
 
-| Version | Note |
-| ------------- |-------------|
-| 2.0.0 | ```alg``` and ```x5c``` in JWK are not mandatory.<br>Removed ```loa2``` acr value as it is unsupported anymore.<br>Added string lengths in ```/ros``` endpoint.<br>First GitHub release. |
-| 1.2.8 | Fixed missing ```iss``` and ```sub``` in JWT in ```/registration``` endpoint. |
-| 1.2.7 | ```claims``` in auth endpoint request set se deprecated.<br>Fixed ```signObject_hash``` in ros endpoint.   |
-| 1.2.6 | ```primary_nationality``` set se deprecated.  |
+| Version | Note                                                                                                                                                                                     |
+|---------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 2.0.1   | ```X-B3-TraceId``` recommended length 32 characters, but it can be shorter.                                                                                                                                    |
+| 2.0.0   | ```alg``` and ```x5c``` in JWK are not mandatory.<br>Removed ```loa2``` acr value as it is unsupported anymore.<br>Added string lengths in ```/ros``` endpoint.<br>First GitHub release. |
+| 1.2.8   | Fixed missing ```iss``` and ```sub``` in JWT in ```/registration``` endpoint.                                                                                                            |
+| 1.2.7   | ```claims``` in auth endpoint request set se deprecated.<br>Fixed ```signObject_hash``` in ros endpoint.                                                                                 |
+| 1.2.6   | ```primary_nationality``` set se deprecated.                                                                                                                                             |
 
 <details>
 <summary>Old Changes</summary>
