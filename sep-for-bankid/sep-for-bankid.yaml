@@ -55,62 +55,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/traceId'
 
-  /front-channel/logout:
-    get:
-      description: >-
-        Logout endpoint specified in [OpenID.FrontChannelLogout](https://openid.net/specs/openid-connect-frontchannel-1_0.html). Rendered in an IFrame
-      tags:
-        - Front-Channel Logout
-      operationId: frontChannelLogout
-      parameters:
-        - in: header
-          name: traceId
-          schema:
-            $ref: '#/components/schemas/traceId'
-        - name: iss
-          in: query
-          schema:
-            type: string
-          description: Issuer Identifier, as specified in Section 2 of [OpenID.Core].
-          example: https://idp.example.com
-        - name: sid
-          in: query
-          schema:
-            type: string
-          description: >-
-            Session ID - String identifier for a Session. This represents a Session of a User Agent
-            or device for a logged-in End-User at an RP. Different sid values are used to identify
-            distinct sessions at an OP. The sid value need only be unique in the context of a particular issuer. 
-            Its contents are opaque to the RP. Its syntax is the same as an OAuth 2.0 Client Identifier.
-      responses:
-        '200':
-          description: Logout successful
-          headers:
-            traceId:
-              description: Unique ID for each API call for support purposes.
-              schema:
-                $ref: '#/components/schemas/traceId'
-        '400':
-          description: Logout request was invalid
-          headers:
-            traceId:
-              description: Unique ID for each API call for support purposes.
-              schema:
-                $ref: '#/components/schemas/traceId'
-        '500':
-          description: Logout has failed
-          headers:
-            traceId:
-              description: Unique ID for each API call for support purposes.
-              schema:
-                $ref: '#/components/schemas/traceId'
-        '504':
-          description: Logout succeeded but some downstream logouts have failed
-          headers:
-            traceId:
-              description: Unique ID for each API call for support purposes.
-              schema:
-                $ref: '#/components/schemas/traceId'
+
   /notify:
     post:
       description: >-
