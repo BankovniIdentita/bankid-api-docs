@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: APIs exposed by Bank iD for Identity Providers
-  version: 2.0.0
+  version: 2.0.1
   description: >
     Describes APIs exposed by Bank iD for Identity Providers. Changelog available at [GitHub](https://github.com/BankovniIdentita/bankid-api-docs/tree/main/bankid-for-idp)
 
