@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Bank iD APIs for Service Providers
-  version: 2.0.0
+  version: 2.0.1
   description: |
     Describes APIs exposed by Bank iD for Service Providers. Changelog available at [GitHub](https://github.com/BankovniIdentita/bankid-api-docs/tree/main/bankid-for-sep).
 
@@ -4621,7 +4621,7 @@ components:
         error:
           type: string
           enum:
-            - not_implemented
+            - invalid_request
         error_description:
           type: string
           example: The QSIGN service is unavailable.
