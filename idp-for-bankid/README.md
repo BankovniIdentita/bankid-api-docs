@@ -6,6 +6,7 @@ Banks are required to implement APIs that are specified in this document, as tha
 
 | Version | Note                                                                                                                                                                                     |
 |---------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 2.0.2   |Added new supported Marital statuses.                                                                                                                                                                                                                                                                                                                                     |
 | 2.0.1   |Fixed description ```X-B3-TraceId``` recommended length 32 characters, but it can be shorter.<br>Fixed description ```document_hash``` length to 128.<br>Fixed descriptions. ```envelope_name``` doesn't have to be unique.                                      |
 | 2.0.0   | ```alg``` and ```x5c``` in JWK are not mandatory.<br>Removed ```loa2``` acr value as it is unsupported anymore.<br>Added string lengths in ```/ros``` endpoint.<br>First GitHub release. |
 | 1.2.8   | Fixed missing ```iss``` and ```sub``` in JWT in ```/registration``` endpoint.                                                                                                            |

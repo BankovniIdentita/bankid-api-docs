@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Bank iD APIs for Service Providers
-  version: 2.0.1
+  version: 2.0.2
   description: |
     Describes APIs exposed by Bank iD for Service Providers. Changelog available at [GitHub](https://github.com/BankovniIdentita/bankid-api-docs/tree/main/bankid-for-sep).
 
@@ -1113,7 +1113,7 @@ components:
     document_id:
       name: document_id
       in: query
-      required: false
+      required: true
       description: >-
         Id of document can be any string, doesn't have to match the ```documentId``` value from the metadata of the PDF document.
       schema:
@@ -1860,6 +1860,11 @@ components:
           * `REGISTERED_PARTNERSHIP_CANCELED` - registered partnership canceled status
           * `WIDOWED` - widowed status
           * `SINGLE` - single status
+          * `PARTNERSHIP` - partnership status
+          * `PARTNERSHIP_CANCELED` - canceled partnership
+          * `SEPARATED` - separated status
+          * `REGISTERED_PARTNERSHIP_WIDOWED` - widowed registered partnership
+          * `LAPSED_MARRIAGE` - discontinued marriage
           * `UNKNOWN` - unknown status
       enum:
         - COHABITATION
@@ -2550,6 +2555,7 @@ components:
     documentObject:
       type: object
       required:
+        - document_id
         - document_hash
         - hash_alg
         - document_title
@@ -2559,7 +2565,6 @@ components:
         - document_created
         - document_size
         - document_read_by_enduser
-        - document_uri
       properties:
         document_id:
           description: >-
@@ -2584,12 +2589,12 @@ components:
         document_title:
           type: string
           maxLength: 255
-          description: Title of document, can be empty string. Unsupported characters are "#" "%" "{" "}" "<" ">" "*" "?" "$" “\u0027” “\u0022” "+" "`" "|" "=".
+          description: Title of document, can be empty string. Must match the value from the PDF document metadata. Unsupported characters are "#" "%" "{" "}" "<" ">" "*" "?" "$" “\u0027” “\u0022” "+" "`" "|" "=".
           example: 'Smlouva o smlouvě'
         document_subject:
           type: string
           maxLength: 255
-          description: Subject of document, can be empty string. Unsupported characters are "#" "%" "{" "}" "<" ">" "*" "?" "$" “\u0027” “\u0022” "+" "`" "|" "=".
+          description: Subject of document, can be empty string. Must match the value from the PDF document metadata. Unsupported characters are "#" "%" "{" "}" "<" ">" "*" "?" "$" “\u0027” “\u0022” "+" "`" "|" "=".
           example: 'Smlouva se společností ACME'
         document_language:
           type: string
@@ -2597,12 +2602,12 @@ components:
           example: cs.CZ
         document_created:
           type: string
-          description: Date of creation of document
+          description: Date of creation of document. Must match the value from the PDF document metadata.
           format: 'date-time'
           example: '2020-06-24T08:54:11+00:00'
         document_author:
           type: string
-          description: Author of document, can be empty string. In case of PDF 2.0 is taken from XMP data.
+          description: Author of document, can be empty string. Must match the value from the PDF document metadata. In case of PDF 2.0 is taken from XMP data.
           example: 'Orange SK'
         document_size:
           type: integer
@@ -2674,11 +2679,12 @@ components:
         sign_field:
           type: string
           description: Sign field already present in the document for the purpose of creation of the visual signature.
-          example: ['Signature 1']
+          example: 'Signature 1'
 
     multiDocumentObject:
       type: object
       required:
+        - document_id
         - document_priority
         - document_hash
         - hash_alg
@@ -2715,12 +2721,12 @@ components:
         document_title:
           type: string
           maxLength: 255
-          description: Title of document, can be empty string. Unsupported characters are "#" "%" "{" "}" "<" ">" "*" "?" "$" “\u0027” “\u0022” "+" "`" "|" "=".
+          description: Title of document, can be empty string. Must match the value from the PDF document metadata. Unsupported characters are "#" "%" "{" "}" "<" ">" "*" "?" "$" “\u0027” “\u0022” "+" "`" "|" "=".
           example: 'Smlouva o smlouvě'
         document_subject:
           type: string
           maxLength: 255
-          description: Subject of document, can be empty string. Unsupported characters are "#" "%" "{" "}" "<" ">" "*" "?" "$" “\u0027” “\u0022” "+" "`" "|" "=".
+          description: Subject of document, can be empty string. Must match the value from the PDF document metadata. Unsupported characters are "#" "%" "{" "}" "<" ">" "*" "?" "$" “\u0027” “\u0022” "+" "`" "|" "=".
           example: 'Smlouva s společností ACME'
         document_language:
           type: string
@@ -2728,13 +2734,13 @@ components:
           example: cs.CZ
         document_created:
           type: string
-          description: Date of creation of document
+          description: Date of creation of document. Must match the value from the PDF document metadata.
           format: 'date-time'
           example: '2020-06-24T08:54:11+00:00'
         document_author:
           type: string
           maxLength: 255
-          description: Author of document, can be empty string. In case of PDF 2.0 is taken from XMP data.
+          description: Author of document, can be empty string. Must match the value from the PDF document metadata. In case of PDF 2.0 is taken from XMP data.
           example: 'Orange SK'
         document_size:
           type: integer
@@ -2805,7 +2811,7 @@ components:
         sign_field:
           type: string
           description: Sign field already present in the document for the purpose of creation of the visual signature.
-          example: ['Signature 1']
+          example: 'Signature 1'
 
     documentObjects:
       type: object

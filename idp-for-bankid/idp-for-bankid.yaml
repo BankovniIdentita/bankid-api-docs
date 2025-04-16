@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: APIs exposed for Bank iD by Identity Providers
-  version: 2.0.1
+  version: 2.0.2
   description: |
     Describes APIs exposed by Identity Providers for Bank iD. Changelog available at [GitHub](https://github.com/BankovniIdentita/bankid-api-docs/tree/main/idp-for-bankid).
 
@@ -1487,6 +1487,11 @@ components:
           * `REGISTERED_PARTNERSHIP_CANCELED` - registered partnership canceled status
           * `WIDOWED` - widowed status            
           * `SINGLE` - single status
+          * `PARTNERSHIP` - partnership status
+          * `PARTNERSHIP_CANCELED` - canceled partnership
+          * `SEPARATED` - separated status
+          * `REGISTERED_PARTNERSHIP_WIDOWED` - widowed registered partnership
+          * `LAPSED_MARRIAGE` - discontinued marriage
           * `UNKNOWN` - unknown status
       enum:
         - COHABITATION
