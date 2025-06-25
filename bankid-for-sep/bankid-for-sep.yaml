@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Bank iD APIs for Service Providers
-  version: 2.0.2
+  version: 2.0.3
   description: |
     Describes APIs exposed by Bank iD for Service Providers. Changelog available at [GitHub](https://github.com/BankovniIdentita/bankid-api-docs/tree/main/bankid-for-sep).
 
@@ -2344,7 +2344,8 @@ components:
         max_age:
           type: number
           minimum: 600
-          description: Value in seconds. Expiration of request object on client's or server's side. The documents will be removed from the server after expiration.
+          maximum: 15552000
+          description: Value in seconds. Expiration of request object on client's or server's side. The documents will be removed from the server after expiration. If the value is outside this interval, it will be limited by the currently defined minimum/maximum.
           example: 3600
         ui_locales:
           description: >-
