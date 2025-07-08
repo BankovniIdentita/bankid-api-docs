@@ -1,15 +1,16 @@
 # APIs exposed by Bank iD for Identity Providers
 
-| Version | Note |
-| ------------- |-------------|
-| 2.0.0   | Fixed endpoint descriptions. Added string lenghts and formats.<br>```alg``` and ```x5c``` is not required anymore in JWK.<br>First GitHub release.  |
-| 1.2.3   | Fixed ```/notify``` endpoint description and added example.  |
-| 1.2.2   | Fixed content-type to application/json in endpoint ```user-stat-data```<br>Added number of IdP records returned and ability to limit to IdP only records.<br>Fixed wrong body for ```/back-channel/logout``` in documentation  |
-| 1.2.1   | Added endpoint ```user-stat-data```<br>Fixed required fields in ```notify``` response  |
-| 1.2.0   | Added traceId to all endpoints for support purposes<br>Overall cleanup  |
-| 1.1.1   | Clarified `signObject` and `documentObject` specification and examples<br>Clarified various property data types and examples throughout the signing process |
-| 1.1.0   | fixed error status code in /logout endpoint  |
-| 1.0.0   | the first version of the document    |
+| Version | Note                                                                                                                                                                                                                          |
+|---------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 2.0.1   | Removed deprecated endpoint ```/user-stat-data```                                                                                                                                                                              |
+| 2.0.0   | Fixed endpoint descriptions. Added string lenghts and formats.<br>```alg``` and ```x5c``` is not required anymore in JWK.<br>First GitHub release.                                                                            |
+| 1.2.3   | Fixed ```/notify``` endpoint description and added example.                                                                                                                                                                   |
+| 1.2.2   | Fixed content-type to application/json in endpoint ```user-stat-data```<br>Added number of IdP records returned and ability to limit to IdP only records.<br>Fixed wrong body for ```/back-channel/logout``` in documentation |
+| 1.2.1   | Added endpoint ```user-stat-data```<br>Fixed required fields in ```notify``` response                                                                                                                                         |
+| 1.2.0   | Added traceId to all endpoints for support purposes<br>Overall cleanup                                                                                                                                                        |
+| 1.1.1   | Clarified `signObject` and `documentObject` specification and examples<br>Clarified various property data types and examples throughout the signing process                                                                   |
+| 1.1.0   | fixed error status code in /logout endpoint                                                                                                                                                                                   |
+| 1.0.0   | the first version of the document                                                                                                                                                                                             |
 
 **Source material and relevant modifications:**
 
