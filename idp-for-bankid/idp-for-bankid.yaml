@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: APIs exposed for Bank iD by Identity Providers
-  version: 2.0.2
+  version: 2.0.3
   description: |
     Describes APIs exposed by Identity Providers for Bank iD. Changelog available at [GitHub](https://github.com/BankovniIdentita/bankid-api-docs/tree/main/idp-for-bankid).
 
@@ -2196,7 +2196,7 @@ components:
           items: 
             type: string
           description: >-
-            This parameter contains a string hash consisting of the document type and the user document. The document type is a String representing one of the values from the code list for the idcards [] .type element in the endpoint /profile. UNKNOWN type is not allowed.
+            This parameter contains a string hash consisting of the document type and the user document. Only valid user documents can be submitted. The document type is a String representing one of the values from the code list for the idcards [] .type element in the endpoint /profile. UNKNOWN type is not allowed.
 
 
             Possible types (same as idcards.type entity):
