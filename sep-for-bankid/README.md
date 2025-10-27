@@ -2,6 +2,7 @@
 
 | Version | Note                                                                                             |
 |---------|--------------------------------------------------------------------------------------------------|
+| 2.0.2   | ```/back-channel/logout``` endpoint - fixed incorrect description in documentation               |
 | 2.0.1   | Removed ```/front-channel/logout``` endpoint.                                                    |
 | 2.0.0   | Removed ```sid``` from ```/back-channel/logout```<br>First GidHub release.                       |
 | 1.2.0   | Added ```traceId``` for support purposes to all endpoints<br>Cleaned up unused components        |
