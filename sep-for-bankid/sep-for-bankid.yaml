@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: APIs exposed by Service Providers for Bank iD
-  version: 2.0.1
+  version: 2.0.2
   description: |
     Describes APIs exposed by Service Providers for Bank iD. Changelog available at [GitHub](https://github.com/BankovniIdentita/bankid-api-docs/tree/main/sep-for-bankid).
 
@@ -20,9 +20,9 @@ paths:
             $ref: '#/components/schemas/traceId'
       requestBody:
         required: true
-        description: JWT contating JSON as payload.
+        description: JWT containing JSON as payload. [Back-Channel Logout API documentation](https://developer.bankid.cz/docs/apis_sep#back-channel-logout-api).
         content:
-          application/jwe:
+          application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/BackLogoutRequest'
       responses:
@@ -133,59 +133,16 @@ components:
         description: '[OpenID.BackChannelLogout] 2.4. Logout Token'
         url: 'https://openid.net/specs/openid-connect-backchannel-1_0.html#LogoutToken'
       description: >-
-        Signed and encrypted JWT similar to the ID Token containing the following fields:
+        JWT containing JSON as payload. [Back-Channel Logout API documentation](https://developer.bankid.cz/docs/apis_sep#back-channel-logout-api).
       type: object
       required:
-        - iss
-        - sub
-        - aud
-        - iat
-        - jti
-        - events
+        - logout_token
       properties:
-        iss:
+        logout_token:
           type: string
           description: >-
-            Issuer Identifier for the Issuer of the response.
-            The iss value is a case sensitive URL using the https scheme that contains scheme, host, and optionally, port number and path components and no query or fragment components.
-          example: https://idp.example.com
-        sub:
-          type: string
-          format: uuid
-          description: >-
-            Subject Identifier.
-            A locally unique and never reassigned identifier within the Issuer for the End-User, which is intended to be consumed by the Client, e.g., 24400320 or AItOawmwtWwcT0k51BayewNvutrJUqsvl6qs7A4.
-            It MUST NOT exceed 255 ASCII characters in length.
-            The sub value is a case sensitive string.
-          example: 9456B875-62D3-4533-A502-E05D39936F3A
-        aud:
-          type: string
-          description: >-
-            Audience(s) that this ID Token is intended for.
-            It MUST contain the OAuth 2.0 client_id of the Relying Party as an audience value.
-            It MAY also contain identifiers for other audiences.
-            In the general case, the aud value is an array of case sensitive strings.
-            In the common special case when there is one audience, the aud value MAY be a single case sensitive string.
-          example: F932FF05-E04C-4CD1-86E4-CE82F1F51EFB
-        iat:
-          type: number
-          format: int64
-          description: Time at which the JWT was issued.
-          example: 3600
-        jti:
-          type: string
-          description: >-
-            JWT ID. A unique identifier for the token, which can be used to prevent reuse of the token.
-            These tokens MUST only be used once, unless conditions for reuse were negotiated between the parties; any such negotiation is beyond the scope of this specification
-          example: 913CC0F7-27BA-40D9-9F4F-8DF74AC3596B
-        events:
-          type: object
-          description: Claim whose value is a JSON object containing the member name http://schemas.openid.net/event/backchannel-logout. This declares that the JWT is a Logout Token. The corresponding member value MUST be a JSON object and SHOULD be the empty JSON object {}.
-          required:
-            - 'http://schemas.openid.net/event/backchannel-logout'
-          properties:
-            'http://schemas.openid.net/event/backchannel-logout':
-              type: object
+            Signed and encrypted JWT
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
 
     NotificationEvent:
       description: >-

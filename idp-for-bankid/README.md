@@ -6,6 +6,7 @@ Banks are required to implement APIs that are specified in this document, as tha
 
 | Version | Note                                                                                                                                                                                                                       |
 |---------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 2.0.4   | ```maritalstatus``` enum updated                                                                                                                                                            |
 | 2.0.3   | Only valid user documents can be submitted in ```idcard_hashes```                                                                                                                                                          |
 | 2.0.2   | Added new supported Marital statuses.                                                                                                                                                                                      |
 | 2.0.1   | Fixed description ```X-B3-TraceId``` recommended length 32 characters, but it can be shorter.<br>Fixed description ```document_hash``` length to 128.<br>Fixed descriptions. ```envelope_name``` doesn't have to be unique. |
