@@ -1,13 +1,14 @@
 # APIs to be exposed by Service Providers for Bank iD
 
-| Version | Note                                                                                             |
-|---------|--------------------------------------------------------------------------------------------------|
-| 2.0.2   | ```/back-channel/logout``` endpoint - fixed incorrect description in documentation               |
-| 2.0.1   | Removed ```/front-channel/logout``` endpoint.                                                    |
-| 2.0.0   | Removed ```sid``` from ```/back-channel/logout```<br>First GidHub release.                       |
-| 1.2.0   | Added ```traceId``` for support purposes to all endpoints<br>Cleaned up unused components        |
+| Version | Note                                                                                            |
+|---------|-------------------------------------------------------------------------------------------------|
+| 2.0.3   | ```affected_claims``` updated supported values                                                  |
+| 2.0.2   | ```/back-channel/logout``` endpoint - fixed incorrect description in documentation              |
+| 2.0.1   | Removed ```/front-channel/logout``` endpoint.                                                   |
+| 2.0.0   | Removed ```sid``` from ```/back-channel/logout```<br>First GidHub release.                      |
+| 1.2.0   | Added ```traceId``` for support purposes to all endpoints<br>Cleaned up unused components       |
 | 1.1.0   | Fixed error status code in ```/logout``` endpoint<br>Specified the case of JWT object encryption |
-| 1.0.0   | The first version of the document                                                                |
+| 1.0.0   | The first version of the document                                                               |
 
 **Source material and relevant modifications:**
 

@@ -2,6 +2,7 @@
 
 | Version | Note                                                                                                                                                                                                                          |
 |---------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 2.0.3   | ```affected_claims``` updated supported values
 | 2.0.2   | Added endpoint ```user-stat-data```
 | 2.0.1   | Removed deprecated endpoint ```/user-stat-data```                                                                                                                                                                              |
 | 2.0.0   | Fixed endpoint descriptions. Added string lenghts and formats.<br>```alg``` and ```x5c``` is not required anymore in JWK.<br>First GitHub release.                                                                            |
