@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Bank iD APIs for Service Providers
-  version: 2.0.4
+  version: 2.0.5
   description: |
     Describes APIs exposed by Bank iD for Service Providers. Changelog available at [GitHub](https://github.com/BankovniIdentita/bankid-api-docs/tree/main/bankid-for-sep).
 
@@ -2440,6 +2440,7 @@ components:
             **Things to watch out for:**
               - the hash of the uploaded document MUST be the same as the ```document_hash``` element during the last /ros request
               - the document is uploaded as a POST ```form-data```
+              - the maximum size allowed for each individual file is 10 MB
 
             Example of document upload:
             ```
@@ -2460,6 +2461,7 @@ components:
             **Things to watch out for:**
               - the hash of the uploaded document MUST be the same as the ```document_hash``` element during the last /ros request
               - the document is uploaded as a POST ```form-data```
+              - the maximum size allowed for each individual file is 10 MB
 
             Example of document upload:
             ```

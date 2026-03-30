@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: APIs exposed by Bank iD for Identity Providers
-  version: 2.0.2
+  version: 2.0.4
   description: >
     Describes APIs exposed by Bank iD for Identity Providers. Changelog available at [GitHub](https://github.com/BankovniIdentita/bankid-api-docs/tree/main/bankid-for-idp)
 
@@ -250,7 +250,7 @@ components:
         idp:
           type: boolean
           description: >-
-            Limit only to IdP records, where SeP is also IdP.
+            If set to true, filters results to banking applications only (where SeP is also IdP). The filter identifies these applications based on a match between the bank's 'taxnumber' and the application.
           example: true
         idpSub:
           type: string
@@ -395,7 +395,7 @@ components:
           description: |
             An array of modified claims. This is relevant for `type` of `claims_updated`. 
             
-            Supported values: `sub`, `claims_updated`, `birthdate`, `age`, `date_of_death`, `email`, `email_verified`, `locale`, `name`, `given_name`, `family_name`, `middle_name`, `nickname`, `preferred_username`, `phone_number`, `phone_number_verified`, `updated_at`, `zoneinfo`, `addresses`, `birthnumber`, `gender`, `paymentAccounts`, `paymentAccountsDetails`, `title_prefix`, `title_suffix`, `birthplace`, `birthcountry`, `primary_nationality`, `nationalities`, `idcards`, `majority`, `pep`, `limited_legal_capacity`, `maritalstatus`, `trust_framework`, `time`, `verification_process`
+            Supported values: `sub`, `claims_updated`, `birthdate`, `date_of_death`, `email`, `email_verified`, `locale`, `name`, `given_name`, `family_name`, `middle_name`, `nickname`, `preferred_username`, `phone_number`, `phone_number_verified`, `updated_at`, `zoneinfo`, `addresses`, `birthnumber`, `gender`, `paymentAccounts`, `paymentAccountsDetails`, `title_prefix`, `title_suffix`, `birthplace`, `birthcountry`, `primary_nationality`, `nationalities`, `idcards`, `majority`, `pep`, `limited_legal_capacity`, `maritalstatus`, `trust_framework`, `time`, `verification_process`
           example: ['phone_number', 'addresses', 'idcards']
     
     NotificationRequest:

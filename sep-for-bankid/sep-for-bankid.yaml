@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: APIs exposed by Service Providers for Bank iD
-  version: 2.0.2
+  version: 2.0.4
   description: |
     Describes APIs exposed by Service Providers for Bank iD. Changelog available at [GitHub](https://github.com/BankovniIdentita/bankid-api-docs/tree/main/sep-for-bankid).
 
@@ -186,5 +186,5 @@ components:
             An optional array of modified claims. This is relevant for `type` of `claims_updated`. 
 
             Supported values: 
-              `sub`, `claims_updated`, `birthdate`, `age`, `date_of_death`, `email`, `email_verified`, `locale`, `name`, `given_name`, `family_name`, `middle_name`, `nickname`, `preferred_username`, `phone_number`, `phone_number_verified`, `updated_at`, `zoneinfo`, `addresses`, `birthnumber`, `gender`, `paymentAccounts`, `paymentAccountsDetails`, `title_prefix`, `title_suffix`, `birthplace`, `birthcountry`, `primary_nationality`, `nationalities`, `idcards`, `majority`, `pep`, `limited_legal_capacity`, `maritalstatus`, `trust_framework`, `time`, `verification_process`
+              `sub`, `claims_updated`, `birthdate`, `date_of_death`, `email`, `email_verified`, `locale`, `name`, `given_name`, `family_name`, `middle_name`, `nickname`, `preferred_username`, `phone_number`, `phone_number_verified`, `updated_at`, `zoneinfo`, `addresses`, `birthnumber`, `gender`, `paymentAccounts`, `paymentAccountsDetails`, `title_prefix`, `title_suffix`, `birthplace`, `birthcountry`, `primary_nationality`, `nationalities`, `idcards`, `majority`, `pep`, `limited_legal_capacity`, `maritalstatus`, `trust_framework`, `time`, `verification_process`
           example: ['phone_number', 'addresses', 'idcards']
