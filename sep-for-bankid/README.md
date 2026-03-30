@@ -2,6 +2,7 @@
 
 | Version | Note                                                                                            |
 |---------|-------------------------------------------------------------------------------------------------|
+| 2.0.4   | ```affected_claims``` updated supported values                                                  |
 | 2.0.3   | ```affected_claims``` updated supported values                                                  |
 | 2.0.2   | ```/back-channel/logout``` endpoint - fixed incorrect description in documentation              |
 | 2.0.1   | Removed ```/front-channel/logout``` endpoint.                                                   |
