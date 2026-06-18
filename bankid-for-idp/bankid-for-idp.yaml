@@ -384,7 +384,7 @@ components:
           type: array
           items:
             type: string
-            format: uuid
+            maxLength: 256
           description: >-
             An array of affected client_ids
           example: ['F932FF05-E04C-4CD1-86E4-CE82F1F51EFB']

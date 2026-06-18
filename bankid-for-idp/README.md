@@ -2,6 +2,7 @@
 
 | Version | Note                                                                                                                                                                                                                          |
 |---------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 2.0.5   | ```affected_client_ids``` Fixed incorrect data type
 | 2.0.4   | ```affected_claims``` updated supported values, endpoint ```user-stat-data``` parameter ```idp``` filters results to all banking applications
 | 2.0.3   | ```affected_claims``` updated supported values
 | 2.0.2   | Added endpoint ```user-stat-data```
