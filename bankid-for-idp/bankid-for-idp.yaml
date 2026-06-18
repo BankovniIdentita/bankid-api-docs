@@ -376,7 +376,6 @@ components:
             What is the original time that this event has happened at
         sub:
           type: string
-          format: uuid
           description: >-
             Affected sub
           example: '9456B875-62D3-4533-A502-E05D39936F3A'
