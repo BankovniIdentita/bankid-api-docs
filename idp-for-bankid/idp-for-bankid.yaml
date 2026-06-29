@@ -716,7 +716,7 @@ paths:
         - openid (always required scope)
         - offline_access (the scope must be specified if a refresh_token release is required)
         - notification.claims_updated (the application wants to send notifications)
- 
+        
         Qualified signature scopes:
         - sign.qualified (the application wants to sign using Qualified Certificate)
         - sign.officially_certified (the application wants to sign using Officially Certified Qualified Certificate)
@@ -1118,7 +1118,9 @@ components:
             - none
             - login
             - consent
-        example: 'none consent'
+        example:
+          - none
+          - consent
 
     auth_max_age:
       name: max_age
@@ -1131,7 +1133,7 @@ components:
       schema:
         type: integer
         format: int64
-        example: '6000'
+        example: 6000
 
     auth_ui_locales:
       name: ui_locales
@@ -1224,7 +1226,7 @@ components:
 
         - unsupported_response_type -
               The authorization server does not support obtaining an authorization code using this method.
-              
+        
         - invalid_scope -
               The requested scope is invalid, unknown, or malformed.
 
@@ -1267,7 +1269,7 @@ components:
 
         - registration_not_supported -
               The OP does not support use of the registration parameter defined in Section 7.2.1.
-              
+        
         - eid_doesnt_exist
               The end-user cannot proceed with authentication since they don't have valid eID service. 
 
@@ -1848,7 +1850,7 @@ components:
         - client_id
         - nonce
         - state
-        - acr_value
+        - acr_values
         - response_type
         - max_age
         - structured_scope
@@ -1950,8 +1952,6 @@ components:
     RequestObjectResponse:
       type: object
       required:
-        - iss
-        - aud
         - exp
         - request_uri
       properties:
@@ -1966,7 +1966,7 @@ components:
           type: integer
           format: int64
           description: Max time to live in seconds, after this time upload_uri or upload_uris expire.
-          example: '1665671516'
+          example: 1665671516
 
     signObject:
       type: object
@@ -2198,7 +2198,7 @@ components:
           description: Subject Identifier, as specified in Section 2 of [OpenID.Core].
         idcard_hashes:
           type: array
-          items: 
+          items:
             type: string
           description: >-
             This parameter contains a string hash consisting of the document type and the user document. Only valid user documents can be submitted. The document type is a String representing one of the values from the code list for the idcards [] .type element in the endpoint /profile. UNKNOWN type is not allowed.
@@ -2490,7 +2490,7 @@ components:
         limited_legal_capacity:
           $ref: '#/components/schemas/limited_legal_capacity'
         paymentAccounts:
-          $ref: '#/components/schemas/paymentAccounts'        
+          $ref: '#/components/schemas/paymentAccounts'
         paymentAccountsDetails:
           $ref: '#/components/schemas/paymentAccountsDetails'
         updated_at:
@@ -2634,7 +2634,7 @@ components:
             type: string
             enum:
               - loa3
-            example: ['loa3']
+          example: ['loa3']
           description:
             JSON array containing a list of the Authentication Context Class References respective that possible verification levels this OP supports.
 
@@ -2743,7 +2743,9 @@ components:
           items:
             type: string
             enum:
-              - client_secret_post, client_secret_jwt, private_key_jwt
+              - client_secret_post
+              - client_secret_jwt
+              - private_key_jwt
           description: JSON array containing a list of client authentication methods supported by this introspection endpoint. If omitted, the set of supported authentication methods MUST be determined by other means.
           example: [client_secret_post, client_secret_jwt, private_key_jwt]
         introspection_endpoint_auth_signing_alg_values_supported:
@@ -2751,9 +2753,14 @@ components:
           items:
             type: string
             enum:
-              - HS256, HS512, RS256, RS512, PS512, ES512
-            description: JSON array containing a list of the JWS signing algorithms ("alg" values) supported by the introspection endpoint for the signature on the JWT [JWT] used to authenticate the client at the introspection endpoint. No default algorithms are implied if this entry is omitted. The value "none" MUST NOT be used.
-            example: [HS256, HS512, RS256, RS512, PS512, ES512]
+              - HS256
+              - HS512
+              - RS256
+              - RS512
+              - PS512
+              - ES512
+          description: JSON array containing a list of the JWS signing algorithms ("alg" values) supported by the introspection endpoint for the signature on the JWT [JWT] used to authenticate the client at the introspection endpoint. No default algorithms are implied if this entry is omitted. The value "none" MUST NOT be used.
+          example: [HS256, HS512, RS256, RS512, PS512, ES512]
         display_values_supported:
           type: array
           items:
@@ -3272,7 +3279,7 @@ components:
             IANA "JSON Web Signature and Encryption Algorithms" registry established by [JWA] or be a value that contains a Collision-
             Resistant Name. The "alg" value is a case-sensitive ASCII string.
           type: string
-          example: RS256
+          example: PS512
           enum:
             - PS512
             - ES512
@@ -4031,7 +4038,7 @@ components:
         sub:
           type: string
           description: Subject Identifier, as specified in Section 2 of [OpenID.Core].
-          
+
     unauthorized:
       description: Unauthorized
       properties:
@@ -4199,7 +4206,7 @@ components:
             profile.maritalstatus: maritalstatus
             profile.addresses:
               addresses.type, addresses.street, addresses.buildingapartment,
-              addresses.streetnumber, addresses.evidencenumber, addresses.city, 
+              addresses.streetnumber, addresses.evidencenumber, addresses.city,
               addresses.cityarea, addresses.zipcode, addresses.country and addresses.ruian_reference
             profile.idcards: idcards.type, idcards.description, idcards.country,
               idcards.number, idcards.valid_to, idcards.issuer and idcards.issue_date
@@ -4258,8 +4265,8 @@ components:
           description: Unique ID for each API call for support purposes. The recommended length is 32 characters, but it can be shorter.
           schema:
             $ref: '#/components/schemas/X-B3-TraceId'
-                
-                
+
+
     TooManyRequestError:
       description: Corresponding client have sent too many request
       headers:
@@ -4272,7 +4279,7 @@ components:
         X-B3-TraceId:
           schema:
             $ref: '#/components/schemas/X-B3-TraceId'
-          
+
     UserNotEligible:
       description: End-user data could not be validated online via basic registers or data are missing.
       content:
