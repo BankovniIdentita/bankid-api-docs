@@ -6,6 +6,7 @@ Banks are required to implement APIs that are specified in this document, as tha
 
 | Version | Note                                                                                                                                                                                                                       |
 |---------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 2.0.5   | Minor documentation fixes and formatting.
 | 2.0.4   | ```maritalstatus``` enum updated                                                                                                                                                            |
 | 2.0.3   | Only valid user documents can be submitted in ```idcard_hashes```                                                                                                                                                          |
 | 2.0.2   | Added new supported Marital statuses.                                                                                                                                                                                      |

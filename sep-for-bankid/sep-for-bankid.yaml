@@ -158,7 +158,7 @@ components:
           description: >-
             - claims_updated: A claim has changed. `affected_subs` is mandatory,
                             `affected_claims` is possible to supply as well, depending on the business case
-          example: claim_updated
+          example: claims_updated
         original_event_at:
           type: string
           format: date-time
