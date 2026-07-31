@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: APIs exposed for Bank iD by Identity Providers
-  version: 2.0.4
+  version: 2.0.6
   description: |
     Describes APIs exposed by Identity Providers for Bank iD. Changelog available at [GitHub](https://github.com/BankovniIdentita/bankid-api-docs/tree/main/idp-for-bankid).
 
@@ -3159,8 +3159,10 @@ components:
         initiate_login_uri:
           type: string
           format: uri
+          deprecated: true
           example: https://client.example.com/login
           description: >-
+            DEPRECATED: This parameter is deprecated and will be removed in future versions.
             URI using the https scheme that a third party can use to initiate a login by the RP, as specified in Section 4 of OpenID Connect Core 1.0 [OpenID.Core].
             The URI MUST accept requests via both GET and POST.
             The Client MUST understand the login_hint and iss parameters and SHOULD support the target_link_uri parameter.
