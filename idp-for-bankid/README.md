@@ -6,6 +6,7 @@ Banks are required to implement APIs that are specified in this document, as tha
 
 | Version | Note                                                                                                                                                                                                                       |
 |---------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 2.0.7   | Clarified the format of `outage_planned_until` in the `/healthcheck` endpoint.
 | 2.0.6   | Parameter ```initiate_login_uri``` is deprecated (```/register``` endpoint).
 | 2.0.5   | Minor documentation fixes and formatting.
 | 2.0.4   | ```maritalstatus``` enum updated                                                                                                                                                            |

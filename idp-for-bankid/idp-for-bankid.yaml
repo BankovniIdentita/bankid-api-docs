@@ -3942,8 +3942,8 @@ components:
         outage_planned_until:
           type: string
           format: date-time
-          example: null
-          description: If it is a planned outage, this is the date until which the outage lasts.
+          example: "2026-10-25T03:00:00.000Z"
+          description: If a planned outage is announced or in progress, the instant at which the outage is expected to end (exclusive). `null` if no planned outage is announced.
         outage_description:
           type: string
           example: null
