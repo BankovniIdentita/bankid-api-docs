@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Bank iD APIs for Service Providers
-  version: 2.0.5
+  version: 2.0.7
   description: |
     Describes APIs exposed by Bank iD for Service Providers. Changelog available at [GitHub](https://github.com/BankovniIdentita/bankid-api-docs/tree/main/bankid-for-sep).
 
@@ -1443,6 +1443,7 @@ components:
         default: loa3
         enum:
           - loa3
+          - loa4
         example: 'loa3'
     auth_code_challenge:
       name: code_challenge
@@ -2332,6 +2333,7 @@ components:
           default: loa3
           enum:
             - loa3
+            - loa4
           example: 'loa3'
         response_type:
           type: string
@@ -2910,10 +2912,18 @@ components:
             If present in the Authentication Request, Authorization Servers MUST include a nonce Claim in the ID Token with the Claim Value being the nonce value sent in the Authentication Request. 
             Authorization Servers SHOULD perform no other processing on nonce values used. The nonce value is a case sensitive string.
           example: 'nxrt-084-222_wdutKuOasdj'
+        bank_id:
+          type: string
+          format: uuid
+          description: >-
+            Identifier of the Bank (IdP) the end-user authenticated with.
+            Corresponds to the bank `id` returned by the Bank Listing API (`/api/v1/banks`).
+          example: 7c2e9a41-5b3d-4f8e-a6d0-91b4e2f8c357
         acr:
           type: string
           enum:
             - loa3
+            - loa4
           description: >-
             Authentication Context Class Reference. String specifying an Authentication Context Class Reference value that identifies the Authentication Context Class that the authentication 
             performed satisfied. The value "0" indicates the End-User authentication did not meet the requirements of ISO/IEC 29115 [ISO29115] level 1. Authentication using a long-lived browser 
@@ -3325,6 +3335,7 @@ components:
             type: string
             enum:
               - loa3
+              - loa4
           example: [ 'loa3' ]
           description: JSON array containing a list of the Authentication Context Class References that this OP supports.
         subject_types_supported:
@@ -3918,6 +3929,7 @@ components:
           type: string
           enum:
             - loa3
+            - loa4
           example: 'loa3'
         max_age:
           description: >-
@@ -4247,10 +4259,18 @@ components:
             In case of Logout ID Token a nonce Claim MUST NOT be present.
             Its use is prohibited to make a Logout Token syntactically invalid if used in a forged Authentication Response in place of an ID Token.
           example: 'nxrt-084-222_wdutKuOasdj'
+        bank_id:
+          type: string
+          format: uuid
+          description: >-
+            Identifier of the Bank (IdP) the end-user authenticated with.
+            Corresponds to the bank `id` returned by the Bank Listing API (`/api/v1/banks`).
+          example: 7c2e9a41-5b3d-4f8e-a6d0-91b4e2f8c357
         acr:
           type: string
           enum:
             - 'loa3'
+            - 'loa4'
           description: >-
             Authentication Context Class Reference. String specifying an Authentication Context Class Reference value that identifies the Authentication Context Class that the authentication 
             performed satisfied. The value "0" indicates the End-User authentication did not meet the requirements of ISO/IEC 29115 [ISO29115] level 1. Authentication using a long-lived browser 
