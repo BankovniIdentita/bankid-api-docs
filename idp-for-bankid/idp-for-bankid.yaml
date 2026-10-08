@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: APIs exposed for Bank iD by Identity Providers
-  version: 2.0.6
+  version: 2.0.8
   description: |
     Describes APIs exposed by Identity Providers for Bank iD. Changelog available at [GitHub](https://github.com/BankovniIdentita/bankid-api-docs/tree/main/idp-for-bankid).
 
@@ -1173,6 +1173,7 @@ components:
         type: string
         enum:
           - loa3
+          - loa4
         example: 'loa3'
 
     auth_claims_json:
@@ -1894,6 +1895,7 @@ components:
           default: loa3
           enum:
             - loa3
+            - loa4
           example: 'loa3'
         response_type:
           type: string
@@ -2265,6 +2267,7 @@ components:
           type: string
           enum:
             - loa3
+            - loa4
           description: >-
             The values determine the level of authentication as well as the possible use of authentication factors.
 
@@ -2634,6 +2637,7 @@ components:
             type: string
             enum:
               - loa3
+              - loa4
           example: ['loa3']
           description:
             JSON array containing a list of the Authentication Context Class References respective that possible verification levels this OP supports.
@@ -3149,6 +3153,7 @@ components:
             type: string
             enum:
               - loa3
+              - loa4
           description: >-
             Supported requested Authentication Context Class Reference values.
             The parameter represents supported authentication level values.
@@ -3802,6 +3807,7 @@ components:
           type: string
           enum:
             - loa3
+            - loa4
           description: >-
             The parameter represents the used authentication level.
 
