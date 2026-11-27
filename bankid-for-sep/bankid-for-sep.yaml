@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Bank iD APIs for Service Providers
-  version: 2.0.7
+  version: 2.0.8
   description: |
     Describes APIs exposed by Bank iD for Service Providers. Changelog available at [GitHub](https://github.com/BankovniIdentita/bankid-api-docs/tree/main/bankid-for-sep).
 
@@ -36,6 +36,7 @@ security:
       - notification.claims_updated
       - sign.qualified
       - sign.officially_certified
+      - jmhz
 
 servers:
   - url: https://oidc.sandbox.bankid.cz/
@@ -1091,6 +1092,152 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BankList'
+
+  /public/jmhz/consent-link:
+    post:
+      summary: Creates a deeplink to the consent page in the MPSV Jenda portal.
+      description: |
+        **The JMHZ API is under development.**
+
+        The description reflects the current design and may change, among other things due to changes on the MPSV side. Full description of the proces JMHZ: [JMHZ documentation](https://developer.bankid.cz/docs/jmhz).
+
+        Creates a data request for the applicant at MPSV and returns a deeplink URL to the consent page in the MPSV Jenda portal. The deeplink is single-use and valid for 15 minutes. To open the consent page again, call the endpoint again.
+
+        After consent is given, the SeP downloads the income data directly from the MPSV API using `uuidZadosti` and its MPSV credentials.
+      security:
+        - Bearer: []
+      tags:
+        - JMHZ
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JmhzConsentLinkRequest'
+            example:
+              state: 'bank-id-works'
+              callbackUrl: 'https://sep.example.cz/callback?authorizationId=abc123'
+      responses:
+        '200':
+          description: 'OK'
+          headers:
+            traceId:
+              description: Unique ID for each API call for support purposes.
+              schema:
+                $ref: '#/components/schemas/traceId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JmhzConsentLinkResponse'
+              example:
+                deeplinkUrl: 'https://jenda.mpsv.cz/jmhz-souhlas?jmhzSouhlasId=7e8e8409-8e76-4fdf-a108-533f8b10f0ff&authCode=BANKBSI-bf86dfbc-adbe-4fe3-9be0-779e5615416b-1794208613&callbackUrl=https%3A%2F%2Fsep.example.cz%2Fcallback%3FauthorizationId%3Dabc123'
+                uuidZadosti: '7e8e8409-8e76-4fdf-a108-533f8b10f0ff'
+                expiresAt: '2026-11-09T07:16:53Z'
+        '400':
+          description: "Missing `state` or `callbackUrl` does not match any registered JMHZ Redirect URL"
+          headers:
+            traceId:
+              description: Unique ID for each API call for support purposes.
+              schema:
+                $ref: '#/components/schemas/traceId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JmhzError'
+              example:
+                error: 'invalid_request'
+                error_description: 'callbackUrl does not match any registered JMHZ Redirect URL'
+                trace_id: '6978cbb3ac59fa00843e40d606228857'
+        '401':
+          description: "Missing or invalid `access_token`"
+          headers:
+            traceId:
+              description: Unique ID for each API call for support purposes.
+              schema:
+                $ref: '#/components/schemas/traceId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JmhzError'
+              example:
+                error: 'invalid_token'
+                error_description: 'Invalid/missing access token'
+                trace_id: '6978cbb3ac59fa00843e40d606228857'
+        '403':
+          description: "The token does not contain the `jmhz` scope or the application is disabled"
+          headers:
+            traceId:
+              description: Unique ID for each API call for support purposes.
+              schema:
+                $ref: '#/components/schemas/traceId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JmhzError'
+              example:
+                error: 'insufficient_scope'
+                error_description: 'Access token does not contain scope jmhz'
+                trace_id: '6978cbb3ac59fa00843e40d606228857'
+        '409':
+          description: "The request at MPSV is not ready yet. Repeat the call after a short pause (we recommend 3 seconds)"
+          headers:
+            traceId:
+              description: Unique ID for each API call for support purposes.
+              schema:
+                $ref: '#/components/schemas/traceId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JmhzError'
+              example:
+                error: 'jmhz_not_ready'
+                error_description: 'JMHZ request is not ready yet'
+                trace_id: '6978cbb3ac59fa00843e40d606228857'
+        '422':
+          description: "The applicant's identity could not be verified, the applicant currently has no ID document available (`jmhz_bsi_error`), or MPSV rejected the data request (`jmhz_zadost_error`)"
+          headers:
+            traceId:
+              description: Unique ID for each API call for support purposes.
+              schema:
+                $ref: '#/components/schemas/traceId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JmhzError'
+              example:
+                error: 'jmhz_bsi_error'
+                error_description: 'Applicant identity could not be verified'
+                trace_id: '6978cbb3ac59fa00843e40d606228857'
+        '502':
+          description: "Error while communicating with MPSV"
+          headers:
+            traceId:
+              description: Unique ID for each API call for support purposes.
+              schema:
+                $ref: '#/components/schemas/traceId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JmhzError'
+              example:
+                error: 'mpsv_error'
+                error_description: 'Error while communicating with MPSV'
+                trace_id: '6978cbb3ac59fa00843e40d606228857'
+        '503':
+          description: "The MPSV service is temporarily unavailable"
+          headers:
+            traceId:
+              description: Unique ID for each API call for support purposes.
+              schema:
+                $ref: '#/components/schemas/traceId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JmhzError'
+              example:
+                error: 'mpsv_unavailable'
+                error_description: 'MPSV service is temporarily unavailable'
+                trace_id: '6978cbb3ac59fa00843e40d606228857'
 
 components:
   headers:
@@ -4705,7 +4852,68 @@ components:
         
         * `insufficient_scope` - The request requires higher privileges than provided by the access token. 
           The resource server SHOULD respond with the HTTP 403 (Forbidden) status code and MAY include the "scope" attribute with the scope necessary to access the protected resource.
-  
+    
+
+    JmhzConsentLinkRequest:
+      type: object
+      properties:
+        state:
+          type: string
+          maxLength: 512
+          description: SeP value used to link the call to its workflow. Bank iD passes it to MPSV and MPSV returns it unchanged in the callback.
+          example: 'bank-id-works'
+        callbackUrl:
+          type: string
+          format: uri
+          description: Address the applicant returns to after giving consent. It must match one of the JMHZ Redirect URLs registered in the application.
+          example: 'https://sep.example.cz/callback?authorizationId=abc123'
+      required:
+        - state
+        - callbackUrl
+
+    JmhzConsentLinkResponse:
+      type: object
+      properties:
+        deeplinkUrl:
+          type: string
+          format: uri
+          description: URL of the consent page in the Jenda portal. Redirect the applicant to it without any changes.
+        uuidZadosti:
+          type: string
+          format: uuid
+          description: Identifier of the data request at MPSV. Store it, you need it to download the data from the MPSV API.
+        expiresAt:
+          type: string
+          format: date-time
+          description: Deeplink validity (ISO 8601, UTC), 15 minutes from issue.
+      required:
+        - deeplinkUrl
+        - uuidZadosti
+        - expiresAt
+
+    JmhzError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error code.
+          enum:
+            - invalid_request
+            - invalid_token
+            - insufficient_scope
+            - jmhz_not_ready
+            - jmhz_bsi_error
+            - jmhz_zadost_error
+            - mpsv_error
+            - mpsv_unavailable
+        error_description:
+          type: string
+          description: Error description. Intended for debugging, do not base your application logic on it.
+        trace_id:
+          type: string
+          description: Request identifier. Include it when contacting support.
+      required:
+        - error
 
   securitySchemes:
     AccessTokenAuth:
@@ -4757,6 +4965,7 @@ components:
             notification.claims_updated: The application wants to send notifications
             sign.qualified: Bank iD needs to get data for Qualified certificate.
             sign.officially_certified: Bank iD needs to get data for Qualified certificate.
+            jmhz: Access to the JMHZ service (income data from MPSV), required for /public/jmhz/consent-link
 
     Bearer:
       description: |
