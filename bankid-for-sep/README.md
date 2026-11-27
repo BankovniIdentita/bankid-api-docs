@@ -2,6 +2,7 @@
 
 | Version | Note                                                                                                                                                                                                                                                                                                                                                                                                                      |
 |---------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 2.0.8   | Added new JMHZ section with ```/public/jmhz/consent-link``` endpoint, which returns a deeplink for seamless consent on the MPSV side without logging in again (under development, see [JMHZ documentation](https://developer.bankid.cz/docs/jmhz)).<br>Added new scope ```jmhz```.
 | 2.0.7   | Added ```loa4``` to ```acr_values``` and ```acr```.<br>Added missing ```bank_id``` claim to ID Token.
 | 2.0.6   | Minor documentation fixes and formatting.
 | 2.0.5   | ```upload_uri```maximum size allowed for each individual file is 10 MB.
